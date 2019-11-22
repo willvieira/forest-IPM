@@ -16,7 +16,7 @@
 
 
 # Variable growth function
-growth_Var = function(y, x, Var, ...)
+growth_Var = function(y, x, Var, parsGrowth, ...)
 {
   mean = growth_XEC(x, E, C, parsGrowth)
   growth = dgamma(y, shape = mean^2/Var, rate = mean/Var)
@@ -26,7 +26,7 @@ growth_Var = function(y, x, Var, ...)
 }
 
 # Variable survival function derived from the deterministic mortality function
-survival = function(x, ...)
+survival = function(x, parsMort, ...)
 {
   surv = 1 - mort_XEC(x, E, C, parsMort)
 
@@ -36,10 +36,10 @@ survival = function(x, ...)
 
 
 ## Survival/growth kernel
-P_xEC = function(y, x, Var, E, C, parsMort, parsGrowth)
+P_xEC = function(y, x, Var, E, C, parsGrowth, parsMort)
 {
-  pkernel = growth_Var(y-x, x, Var, E, C, parsGrowth) *
-            survival(x, E, C, parsMort)
+  pkernel = growth_Var(y-x, x, Var, E, C, parsGrowth = parsGrowth) *
+            survival(x, E, C, parsMort = parsMort)
 
   return( pkernel )
 }
@@ -52,8 +52,8 @@ mkKernel = function(m, U, L, E, C, parsMort, parsGrowth, parsFec)
   h <- (U - L)/m
   meshpts <- L + ((1:m) - 1/2) * h
 
-  P <- h * outer(meshpts, meshpts, P_xEC, E, C, parsMort, parsGrowth, Var = 3)
-  F <- h * outer(meshpts, meshpts, f.yx, parsFec)
+  P <- h * outer(meshpts, meshpts, P_xEC, E, C, parsMort = parsMort, parsGrowth = parsGrowth, Var = 3)
+  F <- h * outer(meshpts, meshpts, fec_X, parsFec)
 
   K <- P + F
 
