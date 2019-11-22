@@ -35,13 +35,17 @@
   mort_XEC = function(x, E, C, parsMort)
   {
 
-    lambda = log(99)/(parsMort$DBH001 * (1 - parsMort$theta))
+    lambda = log(99)/(parsMort['DBH001'] * (1 - parsMort['theta']))
 
-    firstPart = parsMort$psi * # optimal survival
-                (C + (1 - C) * parsMort$beta) * # competition effect
-                exp(-0.5 * (E[1] - parsMort$T_opt)^2/parsMort$sigmaT_opt^2) * # temp effect
-                exp(-0.5 * (E[2] - parsMort$P_opt)^2/parsMort$sigmaP_opt^2) * # prec effect
-                (x/100)^parsMort$phi/(1 + exp(lambda * ((x/10) - parsMort$theta * parsMort$DBH001))) # size effect
+    firstPart = parsMort['psi'] * # optimal survival
+
+                parsMort['Lo'] + ((1 - parsMort['Lo']) / (1 + exp(-parsMort['Beta'] * (C)))) * # competition effect
+
+                exp(-0.5 * (E[1] - parsMort['T_opt'])^2/parsMort['sigmaT_opt']^2) * # temp effect
+
+                exp(-0.5 * (E[2] - parsMort['P_opt'])^2/parsMort['sigmaP_opt']^2) * # prec effect
+
+                (x/100)^parsMort['phi']/(1 + exp(lambda * ((x/10) - parsMort['theta'] * parsMort['DBH001']))) # size effect
 
     return(1/(1 + firstPart)) # logit
   }
