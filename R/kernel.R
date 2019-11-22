@@ -26,11 +26,11 @@ growth_Var = function(y, x, Var, ...)
 }
 
 # Variable survival function derived from the deterministic mortality function
-survival_Var = function(y, x, ...)
+survival = function(x, ...)
 {
-  mort = LaplacesDemon::dbern(y, prob = 1 - (1 - mort_XEC(x, E, C, parsMort)^1))
+  surv = 1 - mort_XEC(x, E, C, parsMort)
 
-  return( mort )
+  return( surv )
 }
 
 
@@ -39,7 +39,7 @@ survival_Var = function(y, x, ...)
 P_xEC = function(y, x, Var, E, C, parsMort, parsGrowth)
 {
   pkernel = growth_Var(y-x, x, Var, E, C, parsGrowth) *
-            survival_Var(y, x, E, C, parsMort)
+            survival(x, E, C, parsMort)
 
   return( pkernel )
 }
