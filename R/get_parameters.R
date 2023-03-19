@@ -2,6 +2,7 @@
 # Get parameters from rstan output
 # Will Vieira
 # November 21, 2019
+# last edited October 10, 2021
 ##############################################################
 
 
@@ -15,43 +16,48 @@
  ######################
 
 
-
-# Setup
-  library(rstan)
-  # species
-  spIds <- '18032-ABI-BAL'
-#
+library(tidyverse)
 
 
+spIds <- c(
+  '28728ACERUB', '28731ACESAC', '183302PICMAR', '18032ABIBAL', '505490THUOCC',
+  '19489BETPAP', '195773POPTRE', '19290QUEALB', '19481BETALL', '19408QUERUB',
+  '183397TSUCAN', '19462FAGGRA', '18037PINTAE', '183385PINSTR', '18034PICRUB',
+  '183295PICGLA', '183319PINBAN'
+)
 
-# Read simulation
-  for(sp in spIds)
-  {
-    for(vRate in c('growth', 'mort', 'fec'))
-    {
-      # load simulation
-      sim <- readRDS('')
-
-      # Output
-      # Get summary output for all chains
-      simSummary <- summary(sim)[[1]]
-      # drop `lp__` value
-      simSummary <- simSummary[-nrow(simSummary), ]
+simNames <- setNames(
+  c('bertalanffy_plotInd_BAspcTempPrec', 'mort_plotYear_sizeBAcompTempPrec', 'rec_m_p_BA'),
+  c('growth', 'mort', 'rec')
+)
 
 
-      # Create parameters data frame
-      params <- data.frame(
-        simSummary[, 'mean'],
-        simSummary[, '2.5%'],
-        simSummary[, '97.5%']
-      )
+dir.create('data')
 
-      # rename cols
-      colnames(params) <- c('mean', 'lo2.5', 'up97.5')
-
-      # save text  file
-      if(!dir.exists('params')) dir.create('params')
-      write.table(params, file = paste0('params/pars_', vRate, '_', sp, '.txt'))
-    }
-  }
-#
+post_pars <- map2_dfr(
+  simNames,
+  names(simNames),
+  function(sim, simName)
+    map_dfr(
+        spIds,
+        ~ readRDS(
+          paste0(
+            '../TreesDemography/output/',
+            sim,
+            '/posteriorPop_',
+            .x,
+            '.RDS'
+          )
+        ) |>
+          bind_cols(species_id = .x)
+      ) |>
+      group_by(species_id, par) |>
+      summarise(
+        qLower = quantile(value, probs = 0.025),
+        qMedian = quantile(value, probs = 0.5),
+        qUpper = quantile(value, probs = 0.975)
+      ) |>
+      ungroup() |>
+      bind_cols(vitalRate = simName)
+) |>
+saveRDS('data/pars_summary.RDS', )
