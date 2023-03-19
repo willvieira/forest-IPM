@@ -2,6 +2,7 @@
 # Vital rate functions for growth, mortality and reproduction
 # Will Vieira
 # January 20, 2019
+# Last updated: March, 18, 2023
 ##############################################################
 
 
@@ -9,72 +10,102 @@
 ######################
  # 1. Growth
  # 2. Mortality
- # 3. Reproduction
+ # 3. Ingrowth
  ######################
 
 
 
-# 2. growth function in function of size (x), temperature and precipitaion (E[1 or 2]) and competition (C)
- growth_XEC <- function(x, E, C, parsGrowth)
- {
+# 1. Von Bertalanffy model to predict future size_t1 as a function of:
+# - time interval between size_t0 and size_t1
+# - Size_t0 (dbh in mm)
+# - Competition (intra and interspecific basal area of indivudal higher than the focal individual)
+# - Mean annual temperature
+# - Mean annual precipitation
+# - plot random effects
+# - individual random effects
 
-   # annual growth rate
-   growth = parsGrowth$pdg *
-            (C + (1 - C) * parsGrowth$beta) * # competition effect
-            exp(-(E[1] - parsGrowth$A)/parsGrowth$B) * exp((-1 - parsGrowth$C) * log(1 + exp(-(E[1] - parsGrowth$A)/parsGrowth$B))) * parsGrowth$C *(1 + 1/parsGrowth$C)^(1 + parsGrowth$C) * # temp effect
-            exp(-(E[2] - parsGrowth$P_opt) * (E[2] - parsGrowth$P_opt)/parsGrowth$sigmaP_opt^2) * # prec effet
-            exp(-log(x/parsGrowth$Phi_opt)*log(x/parsGrowth$Phi_opt)/parsGrowth$sigmaPhi_opt^2) # size effect
+vonBertalanffy_f <- function(
+  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec
+){
+  # Compute r
+  rPlotInd = exp(
+    pars['r'] + # intercept
+    pars['plot_re'] + # plot random effect
+    pars['tree_re'] + # tree random effect
+    pars['Beta'] * (BA_comp_intra + pars['theta'] * BA_comp_inter) + # Comp
+    -pars['tau_temp'] * (Temp - pars['optimal_temp'])^2 + # temp effect
+    -pars['tau_prec'] * (Prec - pars['optimal_prec'])^2 # prec effect
+  )
 
-   return(growth)
- }
-#
+# pre calculate component of the model
+rPlotTime = exp(-rPlotInd * delta_time)
 
+# mean
+mu_obs = size_t0 *
+  rPlotTime +
+  pars['Lmax'] * (1 - rPlotTime)
 
-
-# 2. Probability of mortality (Surv = 1 - mort) in function of size (x), temperature and precipitation (E[1 or 2]) and competition (C)
-  mort_XEC = function(x, E, C, parsMort)
-  {
-
-    lambda = log(99)/(parsMort['DBH001'] * (1 - parsMort['theta']))
-
-    firstPart = parsMort['psi'] * # optimal survival
-
-                parsMort['Lo'] + ((1 - parsMort['Lo']) / (1 + exp(-parsMort['Beta'] * (C)))) * # competition effect
-
-                exp(-0.5 * (E[1] - parsMort['T_opt'])^2/parsMort['sigmaT_opt']^2) * # temp effect
-
-                exp(-0.5 * (E[2] - parsMort['P_opt'])^2/parsMort['sigmaP_opt']^2) * # prec effect
-
-                (x/100)^parsMort['phi']/(1 + exp(lambda * ((x/10) - parsMort['theta'] * parsMort['DBH001']))) # size effect
-
-    return(1/(1 + firstPart)) # logit
-  }
-#
+return( mu_obs )
+}
+ 
 
 
+# 2. Probability of mortality (Surv = 1 - mort) as a function of:
+# - time interval between size_t0 and size_t1
+# - Size_t0 (dbh in mm)
+# - Competition (intra and interspecific basal area of indivudal higher than the focal individual)
+# - Mean annual temperature
+# - Mean annual precipitation
+# - plot random effects
+# - year random effects
+survival_f = function(
+  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec
+){
+  # longevity rate
+  longev_log <- 1/(1 + exp(
+      -(
+        pars['psi'] + 
+        pars['plot_re'] +
+        pars['year_re'] + 
+        -(log(size_t0/pars['size_opt'])/pars['size_var'])^2 +
+        pars['Beta'] * (BA_comp_intra + pars['theta'] * BA_comp_inter) +
+        -pars['tau_temp'] * (Temp - pars['optimal_temp'])^2 +
+        -pars['tau_prec'] * (Prec - pars['optimal_prec'])^2
+      )
+    )
+  )
 
-# 3. Fecundity function (#TODO to be defined)
+	# account for the time interval between sensus
+	survival_prob = longev_log^delta_time;
+	
+  return( survival_prob )
+}
 
-  gLogit <- function(x, L, U, B, C, v, Q, M)
-  {
-    # https://en.wikipedia.org/wiki/Generalised_logistic_function
-    return( L + ((U - L)/(C + exp(-B * (x - M)))^(1/v)) )
-  }
 
-  # this is a constant times a normal distribution times an exponential function
-  fec_X = function(y, x, parsFec)
-  {
 
-    # establishment proportion
-    parsFec$establishment.prob *
-    # reproduction probability
-    gLogit(x,
-      L = 0, U = 1, B = 0.05, C = 1, v = 1, Q = 1, M = parsFec$location) *
-    # Recruitment size distribition
-    dnorm(y,
-      mean = parsFec$recruit.size.mean,
-      sd = parsFec$recruit.size.sd) *
-    # Seed production
-    exp(parsFec$seed.int + parsFec$seed.slope * x)
-  }
-#
+
+# 3. Ingrowth rate as a function of:
+# - plot size
+# - time interval
+# - Basal area of adults from conspecific species
+# - Basal area from all adult species
+
+ingrowth_f <- function(
+  pars, delta_time, plot_size, BA_adult_sp, BA_adult, 
+){
+  mPlot <- exp(
+    pars['mPop_log'] + pars['plot_re'] + BA_adult_sp * pars['beta_m']
+  )
+
+  p <- exp(
+    -exp(
+      pars['p_log']
+    ) +
+    BA_adult^2 * 1/2 * -pars['beta_p']^2
+  )
+
+  # mean
+  ingrowth <- mPlot * plot_size * (1 - p^delta_time) / (1 - p)
+
+  return( ingrowth )
+}
