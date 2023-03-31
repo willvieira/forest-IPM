@@ -1,8 +1,8 @@
 ##############################################################
-# Get parameters from rstan output
+# Get parameters from cmdstanr output
 # Will Vieira
 # November 21, 2019
-# last edited October 10, 2021
+# last edited March 29, 2023
 ##############################################################
 
 
@@ -10,9 +10,8 @@
 ######################
  # For each vital rate:
   # - get spIds
-  # - load rstan output and save summary matrix of all chains
-  # - create data frame with parameters mean, 2.5% and 97.5%
-  # - save data frame as a text file
+  # - load cmdstanr output
+  # - save as iter x parameter matrix for each species x vital rate
  ######################
 
 
@@ -27,14 +26,14 @@ spIds <- c(
 )
 
 simNames <- setNames(
-  c('bertalanffy_plotInd_BAspcTempPrec', 'mort_plotYear_sizeBAcompTempPrec', 'rec_m_p_BA'),
+  c('bertalanffy_plotInd_BAspcTempPrecscl', 'mort_plot_sizeBAcompTempPrec', 'rec_m_p_BA'),
   c('growth', 'mort', 'rec')
 )
 
 
-dir.create('data')
+dir.create(file.path('data', 'parameters'))
 
-post_pars <- map2_dfr(
+map2(
   simNames,
   names(simNames),
   function(sim, simName)
@@ -49,15 +48,14 @@ post_pars <- map2_dfr(
             '.RDS'
           )
         ) |>
-          bind_cols(species_id = .x)
-      ) |>
-      group_by(species_id, par) |>
-      summarise(
-        qLower = quantile(value, probs = 0.025),
-        qMedian = quantile(value, probs = 0.5),
-        qUpper = quantile(value, probs = 0.975)
-      ) |>
-      ungroup() |>
-      bind_cols(vitalRate = simName)
-) |>
-saveRDS('data/pars_summary.RDS', )
+        pivot_wider(
+          names_from = par,
+          values_from = value
+        ) |>
+        write_csv(
+          file.path(
+            'data', 'parameters',
+            paste0(simName, '_', .x, '.csv'))
+        )
+    )
+)
