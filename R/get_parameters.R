@@ -26,13 +26,14 @@ spIds <- c(
 )
 
 simNames <- setNames(
-  c('bertalanffy_plotInd_BAspcTempPrecscl', 'mort_plot_sizeBAcompTempPrec', 'rec_m_p_BA'),
-  c('growth', 'mort', 'rec')
+  c('bertalanffy_plotInd_BAspcTempPrecscl', 'mort_plot_sizeBAcompTempPrec', 'rec_m_p_BA', 'sizeIng_time_log'),
+  c('growth', 'mort', 'rec', 'sizeIngrowth')
 )
 
 
 dir.create(file.path('data', 'parameters'))
 
+# save all vital rate x species parameters as csv
 map2(
   simNames,
   names(simNames),

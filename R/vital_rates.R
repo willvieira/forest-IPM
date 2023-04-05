@@ -25,13 +25,17 @@
 # - individual random effects
 
 vonBertalanffy_f <- function(
-  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec
+  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, randomEffects = TRUE
 ){
   # Compute r
   rPlotInd = exp(
     pars['r'] + # intercept
-    pars['plot_re'] + # plot random effect
-    pars['tree_re'] + # tree random effect
+    ifelse(
+      randomEffects,
+      rnorm(1, 0, pars['sigma_PlotTree'] * pars['p_plotTree']) + # plot re
+      rnorm(1, 0, pars['sigma_PlotTree'] * (1 - pars['p_plotTree'])), # tree re
+      0
+    ) +
     pars['Beta'] * (BA_comp_intra + pars['theta'] * BA_comp_inter) + # Comp
     -pars['tau_temp'] * (Temp - pars['optimal_temp'])^2 + # temp effect
     -pars['tau_prec'] * (Prec - pars['optimal_prec'])^2 # prec effect
@@ -59,14 +63,18 @@ return( mu_obs )
 # - plot random effects
 # - year random effects
 survival_f = function(
-  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec
+  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, randomEffects = TRUE
 ){
   # longevity rate
   longev_log <- 1/(1 + exp(
       -(
-        pars['psi'] + 
-        pars['plot_re'] +
-        pars['year_re'] + 
+        pars['psi'] +
+        ifelse(
+          randomEffects,
+          rnorm(1, 0, pars['sigma_plot']), #+
+          # pars['year_re'],
+          0
+        ) +
         -(log(size_t0/pars['size_opt'])/pars['size_var'])^2 +
         pars['Beta'] * (BA_comp_intra + pars['theta'] * BA_comp_inter) +
         -pars['tau_temp'] * (Temp - pars['optimal_temp'])^2 +
@@ -91,10 +99,16 @@ survival_f = function(
 # - Basal area from all adult species
 
 ingrowth_f <- function(
-  pars, delta_time, plot_size, BA_adult_sp, BA_adult, 
+  pars, delta_time, plot_size, BA_adult_sp, BA_adult, randomEffects = TRUE
 ){
   mPlot <- exp(
-    pars['mPop_log'] + pars['plot_re'] + BA_adult_sp * pars['beta_m']
+    pars['mPop_log'] +
+    ifelse(
+          randomEffects,
+          rnorm(1, 0, pars['sigma_plot']),
+          0
+        ) +
+    BA_adult_sp * pars['beta_m']
   )
 
   p <- exp(
