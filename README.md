@@ -1,2 +1,3 @@
 # forest-IPM
-Integral projection model for trees species of eastern north American
+
+## Integral projection model for the trees of eastern north America
