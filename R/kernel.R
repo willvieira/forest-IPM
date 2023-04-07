@@ -15,6 +15,8 @@
 ######################
 
 
+# Probability functions for growth, mortality, and recruitment
+#################################################################
 
 # Probability function for growth
 vonBertalanffy_lk = function(
@@ -65,15 +67,31 @@ ingrowth_lk <- function(
 }
 
 
+
+# Kernel and functions around building the kernel
+#################################################################
+
+# Compute mesh points
+get_mesh <- function(L, U, h = 1)
+{
+  # mesh points
+  m <- length(seq(L, U, h))
+  meshpts <- L + ((1:m) - 1/2) * h
+
+  return( list(meshpts = meshpts, h = h))
+}
+
 # Full Kernel
 mkKernel = function(
-  m, U, L,
-  delta_time, plot_size, BA_comp_intra, BA_comp_inter, BA_adult_sp, BA_adult, Temp, Prec,
-  pars, randomEffects
+  meshpts, h,
+  Nvec_intra, Nvec_inter,
+  delta_time, plot_size, Temp, Prec, pars, randomEffects
 ){
-  # mesh points
-  h <- (U - L)/m
-  meshpts <- L + ((1:m) - 1/2) * h
+  # compute competition metrics
+  BA_comp_intra <- size_to_BAcomp(meshpts, Nvec_intra, plot_size)
+  BA_comp_inter <- size_to_BAcomp(meshpts, Nvec_inter, plot_size)
+  BA_adult_sp <- BAind_to_BAplot(size_to_BAind(meshpts), Nvec_intra, plot_size)
+  BA_adult <- BAind_to_BAplot(size_to_BAind(meshpts), Nvec_intra + Nvec_inter, plot_size)
 
   P <- h * outer(
     meshpts, meshpts,
