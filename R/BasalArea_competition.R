@@ -42,3 +42,23 @@ size_to_BAcomp <- function(
 			sum(ba_N_plot[mesh > x])
 	)
 }
+
+
+dbh_to_meshpts <- function(
+	dbh,
+	mesh
+){
+	# empty mshpts to count number of individuals per size class
+	mesh_dbh <- rep(0, length(mesh))
+
+	# approximate each individual size to its class
+	dbh_class <- cut(dbh, breaks = mesh, labels = F)
+
+	# count number of ind dbh at each class
+	dbh_count <- table(dbh_class)
+
+	# fill meshpts with the count of each class
+	mesh_dbh[as.numeric(names(dbh_count))] <- dbh_count
+
+	return( mesh_dbh)
+}
