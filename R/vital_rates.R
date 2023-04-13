@@ -108,14 +108,14 @@ ingrowth_f <- function(
           rnorm(1, 0, pars['sigma_plot']),
           0
         ) +
-    BA_adult_sp * pars['beta_m']
+    (-1/pars['sigma_BA']^2) * (BA_adult_sp - pars['optimal_BA'])^2
   )
 
   p <- exp(
     -exp(
       pars['p_log']
     ) +
-    BA_adult^2 * 1/2 * -pars['beta_p']^2
+    BA_adult * -pars['beta_p']
   )
 
   # mean

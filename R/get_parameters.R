@@ -26,7 +26,7 @@ spIds <- c(
 )
 
 simNames <- setNames(
-  c('bertalanffy_plotInd_BAspcTempPrecscl', 'mort_plot_sizeBAcompTempPrec', 'rec_m_p_BA', 'sizeIng_time_log'),
+  c('bertalanffy_plotInd_BAspcTempPrecscl', 'mort_plot_sizeBAcompTempPrec', 'rec_m_p_BA_v2', 'sizeIng_time_truc'),
   c('growth', 'mort', 'rec', 'sizeIngrowth')
 )
 
