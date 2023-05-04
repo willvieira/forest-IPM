@@ -16,7 +16,7 @@
 
 
 library(tidyverse)
-
+library(data.table)
 
 spIds <- c(
   '28728ACERUB', '28731ACESAC', '183302PICMAR', '18032ABIBAL', '505490THUOCC',
@@ -33,7 +33,8 @@ simNames <- setNames(
 
 dir.create(file.path('data', 'parameters'))
 
-# save all vital rate x species parameters as csv
+# save all vital rate x species parameters as csv (population level parameters)
+################################################################################
 map2(
   simNames,
   names(simNames),
@@ -60,3 +61,152 @@ map2(
         )
     )
 )
+
+
+
+# save all individual-plot-year level parameters (slow code)
+################################################################################
+
+base_url = '../TreesDemography/output/'
+treeData = readRDS('../TreesDemography/data/treeData.RDS')
+paste0('data/parameters/randomEffects/', c('growth', 'mort', 'rec')) |>
+  map(~ dir.create(.x, recursive = TRUE))
+
+# Growth random effects (plot and individuals)
+for(sp in spIds)
+{
+  trainData = readRDS(
+    paste0(base_url, simNames['growth'], '/trainData_', sp, '.RDS')
+  )
+  
+  # append plot_id info
+  trainData[
+    treeData,
+    plot_id := i.plot_id,
+    on = c('tree_id')
+  ]
+
+  # load plot parameters
+  plot_pars <- readRDS(
+      paste0(base_url, simNames['growth'], '/posteriorrPlot_', sp, '.RDS')
+    ) |>
+    mutate(plot_id_seq = parse_number(par)) |>
+    select(!par) |>
+    left_join(
+      trainData[, .(plot_id_seq = unique(plot_id_seq)), by = plot_id]
+    ) |>
+    select(!plot_id_seq)
+    
+  # save raw posterior
+  plot_pars |>
+    saveRDS(
+      paste0('data/parameters/randomEffects/growth/plot_', sp, '.RDS')
+    )
+  
+  # save posterior mean
+  plot_pars |>
+    group_by(plot_id) |>
+    reframe(value = mean(value)) |>
+    saveRDS(
+      paste0(
+        'data/parameters/growth_plot_meanRandomEffect_',
+        sp,
+        '.RDS'
+      )
+    )
+
+  # load tree parameters
+  tree_pars <- readRDS(
+      paste0(base_url, simNames['growth'], '/posteriorrTree_', sp, '.RDS')
+    ) |>
+    mutate(tree_id_seq = parse_number(par)) |>
+    select(!par) |>
+    left_join(
+      trainData[, .(tree_id_seq = unique(tree_id_seq)), by = tree_id]
+    ) |>
+    select(!tree_id_seq)
+    
+  # save raw posterior
+  tree_pars |>
+    saveRDS(
+      paste0('data/parameters/randomEffects/growth/tree_', sp, '.RDS')
+    )
+
+  # save posterior mean
+  tree_pars |>
+    group_by(tree_id) |>
+    reframe(value = mean(value)) |>
+    saveRDS(
+      paste0(
+        'data/parameters/growth_tree_meanRandomEffect_',
+        sp,
+        '.RDS'
+      )
+    )
+}
+
+
+
+# mort and recruitment plot random effects
+for(vitalRate in c('mort', 'rec'))
+{
+  for(sp in spIds)
+  {
+    trainData = readRDS(
+      paste0(
+        base_url,
+        simNames[vitalRate],
+        ifelse(vitalRate == 'mort', '/trainData_', '/toSub_'),
+        sp, '.RDS'
+      )
+    )
+    
+    # append plot_id info
+    if(vitalRate == 'mort')
+      trainData[
+        treeData,
+        plot_id := i.plot_id,
+        on = c('tree_id')
+      ]
+
+    # load plot parameters
+    plot_pars <- readRDS(
+        paste0(
+          base_url,
+          simNames[vitalRate],
+          '/posterior',
+          ifelse(vitalRate == 'mort', 'psi', 'm'),
+          'Plot_', sp, '.RDS')
+      ) |>
+      mutate(plot_id_seq = parse_number(par)) |>
+      select(!par) |>
+      left_join(
+        trainData[, .(plot_id_seq = unique(plot_id_seq)), by = plot_id]
+      ) |>
+      select(!plot_id_seq)
+      
+    # save row samples
+    plot_pars |>
+      saveRDS(
+        paste0(
+          'data/parameters/randomEffects/',
+          vitalRate,
+          '/plot_', sp, '.RDS'
+        )
+      )
+
+    # save posterior mean
+    plot_pars |>
+      group_by(plot_id) |>
+      reframe(value = mean(value)) |>
+      saveRDS(
+        paste0(
+          'data/parameters/',
+          vitalRate,
+          '_plot_meanRandomEffect_',
+          sp,
+          '.RDS'
+        )
+      )
+  }
+}
