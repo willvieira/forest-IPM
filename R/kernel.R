@@ -126,6 +126,11 @@ getPars_sp <- function(sp)
     full.names = TRUE
   )
 
+  # remove  random effect files
+   files_to_load <- files_to_load[
+    grep('meanRandomEffect', files_to_load, invert = TRUE)
+   ]
+
   map(
     setNames(
       files_to_load,
