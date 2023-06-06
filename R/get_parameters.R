@@ -76,10 +76,6 @@ map(
       variables = parNames[[.y]]
     )$post_warmup_draws |>
     as_draws_df() |>
-    mutate(
-      species_id = .x,
-      iter = row_number()
-    ) |>
     select(!c(.chain, .iteration, .draw)) |>
     write_csv(
       file.path(
