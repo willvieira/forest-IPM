@@ -25,13 +25,13 @@
 # - individual random effects
 
 vonBertalanffy_f <- function(
-  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random, ind_random
+  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random, year_random
 ){
   # Compute r
   rPlotInd = exp(
     pars['r'] + # intercept
-    plot_random + # single value
-    ind_random + # vector of size N_ind
+    plot_random +
+    year_random +
     pars['Beta'] * (BA_comp_intra + pars['theta'] * BA_comp_inter) + # Comp
     -pars['tau_temp'] * (Temp - pars['optimal_temp'])^2 + # temp effect
     -pars['tau_prec'] * (Prec - pars['optimal_prec'])^2 # prec effect
@@ -59,13 +59,14 @@ return( mu_obs )
 # - plot random effects
 # - year random effects
 survival_f = function(
-  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random
+  pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random, year_random
 ){
   # longevity rate
   longev_log <- 1/(1 + exp(
       -(
         pars['psi'] +
         plot_random +
+        year_random +
         -(log(size_t0/pars['size_opt'])/pars['size_var'])^2 +
         pars['Beta'] * (BA_comp_intra + pars['theta'] * BA_comp_inter) +
         -pars['tau_temp'] * (Temp - pars['optimal_temp'])^2 +
@@ -90,11 +91,12 @@ survival_f = function(
 # - Basal area from all adult species
 
 ingrowth_f <- function(
-  pars, delta_time, plot_size, BA_adult_sp, BA_adult, plot_random
+  pars, delta_time, plot_size, BA_adult_sp, BA_adult, plot_random, year_random
 ){
   mPlot <- exp(
     pars['mPop_log'] +
-    plot_random + 
+    plot_random +
+    year_random +
     (-1/pars['sigma_BA']^2) * (BA_adult_sp - pars['optimal_BA'])^2
   )
 
