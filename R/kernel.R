@@ -183,35 +183,47 @@ init_pop <- function(
 {
   msh <- mshpts$meshpts
 
-  # generate random individuals from the lognorm distribution
-  dbh <- qlnorm(
-    runif(
-      n = 1e4,
-      min = plnorm(min(msh), log(meanSize), log(sdSize)),
-      max = plnorm(
-        round(params[['growth']]['Lmax'], 0), log(meanSize), log(sdSize)
-      )
-    ),
-    log(meanSize), log(sdSize)
-  )
-
-  # get density distribution from genereted individual sizes
-  dbh_den <- density(dbh)$y
-
-  # transform density distribution to approximate total pop size to
-  # the expected N argument
-  diff_N <- expected_N - sum(dbh_den)
-  prod <- ifelse(diff_N > 0, 1 + 1 * diff_N, 1 + 1 * diff_N)
-
-  while(diff_N > accuracy) {
-    new_dbh_den <- dbh_den * prod
-    diff_N <- expected_N - sum(new_dbh_den)
-    if(diff_N > 0) {
-      prod <- prod * 1 + 1 * diff_N
-    }else{
-      prod <- prod * 1 - 1 * diff_N
-    }
+  if(expected_N < 0)
+  {
+    stop('Argument `expected_N` larger or equal than zero.')
   }
-  
-  return( dbh_den * prod )
+  # In case `expected_N` equal zero, return empty dist vector
+  else if(expected_N == 0)
+  {
+    return( rep(0, length(msh)) )
+  }
+  # Generate smooth size dist in function of expected_N
+  else
+  {
+    # generate random individuals from the lognorm distribution
+    dbh <- qlnorm(
+      runif(
+        n = 1e4,
+        min = plnorm(min(msh), log(meanSize), log(sdSize)),
+        max = plnorm(
+          round(params[['growth']]['Lmax'], 0), log(meanSize), log(sdSize)
+        )
+      ),
+      log(meanSize), log(sdSize)
+    )
+
+    # get density distribution from genereted individual sizes
+    dbh_den <- density(dbh, n = length(msh))$y
+
+    # transform density distribution to approximate total pop size to
+    # the expected N argument
+    diff_N <- expected_N - sum(dbh_den)
+    prod <- ifelse(diff_N > 0, 1 + 1 * diff_N, 1 + 1 * diff_N)
+
+    while(diff_N > accuracy) {
+      new_dbh_den <- dbh_den * prod
+      diff_N <- expected_N - sum(new_dbh_den)
+      if(diff_N > 0) {
+        prod <- prod * 1 + 1 * diff_N
+      }else{
+        prod <- prod * 1 - 1 * diff_N
+      }
+    } 
+    return( dbh_den * prod )
+  }
 }
