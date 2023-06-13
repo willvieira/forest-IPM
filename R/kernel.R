@@ -20,10 +20,10 @@
 
 # Probability function for growth
 vonBertalanffy_lk = function(
-  pars, delta_time, size_t1, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random, year_random
+  pars, delta_time, size_t1, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random
 ){
   # get the mean of the prob function for each "ind"
-  growth_mean = vonBertalanffy_f(pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random, year_random)
+  growth_mean = vonBertalanffy_f(pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random)
 
   # likelihood of increment y given defined model and parameters
   growth = dnorm(size_t1, mean = growth_mean, sd = pars['sigma_obs'])
@@ -35,13 +35,13 @@ vonBertalanffy_lk = function(
 
 ## Survival x growth kernel
 P_xEC = function(
-  size_t1, size_t0, delta_time, BA_comp_intra, BA_comp_inter, Temp, Prec, parsGrowth, parsMort, plot_random, year_random
+  size_t1, size_t0, delta_time, BA_comp_intra, BA_comp_inter, Temp, Prec, parsGrowth, parsMort, plot_random
 ){
   pkernel = vonBertalanffy_lk(
-    parsGrowth, delta_time, size_t1, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random[1], year_random[1]
+    parsGrowth, delta_time, size_t1, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random[1]
   ) *
   survival_f(
-    parsMort, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random[2], year_random[3]
+    parsMort, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random[2]
   )
 
   return( pkernel )
@@ -50,10 +50,10 @@ P_xEC = function(
 
 # Probability function for ingrowth
 ingrowth_lk <- function(
-  size_t1, size_t0, delta_time, plot_size, BA_adult_sp, BA_adult, parsIngrowth, parsSizeIngrowth, parsRep, plot_random, year_random
+  size_t1, size_t0, delta_time, plot_size, BA_adult_sp, BA_adult, parsIngrowth, parsSizeIngrowth, parsRep, plot_random
 ){
   ingrowth_prob = ingrowth_f(
-    parsIngrowth, delta_time, plot_size, BA_adult_sp, BA_adult, plot_random, year_random
+    parsIngrowth, delta_time, plot_size, BA_adult_sp, BA_adult, plot_random
   ) *
   truncnorm::dtruncnorm(
     size_t1,
@@ -87,8 +87,7 @@ mkKernel = function(
   meshpoints,
   Nvec_intra, Nvec_inter,
   delta_time, plot_size, Temp, Prec, pars,
-  plot_random, # vector of [1] growth, [2] mortality, and [3] recruitment ofsets
-  year_random  # vector of [1] growth, [2] mortality, and [3] recruitment ofsets
+  plot_random # vector of [1] growth, [2] mortality, and [3] recruitment ofsets
 ){
   meshpts = meshpoints$meshpts
   h = meshpoints$h
@@ -103,12 +102,12 @@ mkKernel = function(
     meshpts, meshpts,
     P_xEC,
     delta_time, BA_comp_intra, BA_comp_inter, Temp, Prec,
-    pars[['growth']], pars[['mort']], plot_random, year_random
+    pars[['growth']], pars[['mort']], plot_random
   )
   F <- h * outer(
     meshpts, meshpts,
     ingrowth_lk,
-    delta_time, plot_size, BA_adult_sp, BA_adult, pars[['rec']], pars[['sizeIngrowth']], pars[['Rep']], plot_random[3], year_random[3]
+    delta_time, plot_size, BA_adult_sp, BA_adult, pars[['rec']], pars[['sizeIngrowth']], pars[['Rep']], plot_random[3]
   )
 
   K <- P + F

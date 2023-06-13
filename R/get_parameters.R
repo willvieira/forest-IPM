@@ -22,9 +22,9 @@ library(cmdstanr)
 library(posterior)
 
 simNames <- c(
-  'growth' = 'bertalanffy_plotYear_BAspcTempPrecscl_fulldb',
-  'mort' = 'mort_plotYear_sizeBAcompTempPrec_alldb',
-  'rec' = 'rec_m_p_BA_plotYear',
+  'growth' = 'bertalanffy_plot_BAspcTempPrecscl_fulldb',
+  'mort' = 'mort_plot_sizeBAcompTempPrec_alldb',
+  'rec' = 'rec_m_p_BA_v2',
   'sizeIngrowth' = 'sizeIng_time_truc_fulldb'
 )
 
@@ -43,15 +43,15 @@ dir.create(file.path('data', 'parameters'), recursive = TRUE)
 # list with parameter names for each vital rate
 parNames <- list(
   'growth' = c(
-    'r', 'sigma_plot', 'sigma_year', 'sigma_obs', 'Lmax', 'Beta',
+    'r', 'sigma_plot', 'sigma_obs', 'Lmax', 'Beta',
     'theta', 'optimal_temp', 'tau_temp', 'optimal_prec', 'tau_prec'
   ),
   'mort' = c(
-    'psi', 'sigma_plot', 'sigma_year', 'size_opt', 'size_var', 'Beta',
+    'psi', 'sigma_plot', 'size_opt', 'size_var', 'Beta',
     'theta', 'optimal_temp', 'tau_temp', 'optimal_prec', 'tau_prec'
   ),
   'rec' = c(
-    'mPop_log', 'sigma_plot', 'sigma_year', 'p_log', 'beta_p',
+    'mPop_log', 'sigma_plot', 'p_log', 'beta_p',
     'optimal_BA', 'sigma_BA'
   ),
   'sizeIngrowth' = c(
