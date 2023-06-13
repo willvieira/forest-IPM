@@ -118,10 +118,17 @@ mkKernel = function(
 
 
 # function to get parameters for specific species_id
-getPars_sp <- function(sp)
+#' sp: species_id
+#' method: either `mean` or `random`. `Mean` is the posterior mean and `random` is a single draw from the posterior mean
+#' path: default is set to 'data/parameters'
+getPars_sp <- function(sp, method, path = NULL)
 {
   files_to_load <- dir(
-    file.path('data', 'parameters'),
+    ifelse(
+      is.null(path),
+      file.path('data', 'parameters'),
+      path
+    ),
     pattern = sp,
     full.names = TRUE
   )
@@ -131,15 +138,31 @@ getPars_sp <- function(sp)
     grep('meanRandomEffect', files_to_load, invert = TRUE)
    ]
 
-  map(
-    setNames(
-      files_to_load,
-      gsub(
-        paste0('data/parameters/|_|', sp, '|.csv'),
-        '',
-        files_to_load
+  # read pars
+  pars <- map(
+      setNames(
+        files_to_load,
+        gsub(
+          paste0('data/parameters/|_|', sp, '|.csv'),
+          '',
+          files_to_load
+        )
+      ),
+      ~ read_csv(.x, progress = FALSE, show_col_types = FALSE)
+    )
+
+  # export pars
+  if(method == 'mean') {
+    pars |>
+      map(~apply(.x, 2, mean))
+  }else if(method == 'random') {
+    pars |>
+      map(
+        ~ .x[sample(1:nrow(.x), 1), ] |>
+          pivot_longer(cols = everything()) |>
+          deframe()
       )
-    ),
-    ~ read_csv(.x, progress = FALSE, show_col_types = FALSE)
-  )
+  }else{
+    stop('`param_method` parameter must be either `mean` or `random`')
+  }
 }
