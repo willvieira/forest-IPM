@@ -166,3 +166,52 @@ getPars_sp <- function(sp, method, path = NULL)
     stop('`param_method` parameter must be either `mean` or `random`')
   }
 }
+
+
+
+# Function to generate a smooth initial size distribution in
+# function of expected population size N
+#' params: species specific parameters
+#' mshpts_h: objected generated from `get_mesh` function
+#' expected_N: approximated population size N expected for the initial size dist
+#' accuracy: minimum accepted error difference between N and expected N
+#' meanSize: mean of lognormal distribution for size distribution
+#' sdSize: standard deviation of lognormal distribution for size distribution
+#' Both meanSize and sdSize parameters are in natural scale
+init_pop <- function(
+  params, mshpts, expected_N, accuracy = 0.001, meanSize = 130, sdSize = 1.8)
+{
+  msh <- mshpts$meshpts
+
+  # generate random individuals from the lognorm distribution
+  dbh <- qlnorm(
+    runif(
+      n = 1e4,
+      min = plnorm(min(msh), log(meanSize), log(sdSize)),
+      max = plnorm(
+        round(params[['growth']]['Lmax'], 0), log(meanSize), log(sdSize)
+      )
+    ),
+    log(meanSize), log(sdSize)
+  )
+
+  # get density distribution from genereted individual sizes
+  dbh_den <- density(dbh)$y
+
+  # transform density distribution to approximate total pop size to
+  # the expected N argument
+  diff_N <- expected_N - sum(dbh_den)
+  prod <- ifelse(diff_N > 0, 1 + 1 * diff_N, 1 + 1 * diff_N)
+
+  while(diff_N > accuracy) {
+    new_dbh_den <- dbh_den * prod
+    diff_N <- expected_N - sum(new_dbh_den)
+    if(diff_N > 0) {
+      prod <- prod * 1 + 1 * diff_N
+    }else{
+      prod <- prod * 1 - 1 * diff_N
+    }
+  }
+  
+  return( dbh_den * prod )
+}
