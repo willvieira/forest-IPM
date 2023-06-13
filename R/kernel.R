@@ -123,12 +123,14 @@ mkKernel = function(
 #' path: default is set to 'data/parameters'
 getPars_sp <- function(sp, method, path = NULL)
 {
+  pars_path <- ifelse(
+    is.null(path),
+    file.path('data', 'parameters'),
+    path
+  )
+
   files_to_load <- dir(
-    ifelse(
-      is.null(path),
-      file.path('data', 'parameters'),
-      path
-    ),
+    pars_path,
     pattern = sp,
     full.names = TRUE
   )
@@ -143,7 +145,7 @@ getPars_sp <- function(sp, method, path = NULL)
       setNames(
         files_to_load,
         gsub(
-          paste0('data/parameters/|_|', sp, '|.csv'),
+          paste0(pars_path, '/|_|', sp, '|.csv'),
           '',
           files_to_load
         )
