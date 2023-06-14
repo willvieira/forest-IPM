@@ -215,17 +215,18 @@ init_pop <- function(
     # transform density distribution to approximate total pop size to
     # the expected N argument
     diff_N <- expected_N - sum(dbh_den)
-    prod <- ifelse(diff_N > 0, 1 + 1 * diff_N, 1 + 1 * diff_N)
 
-    while(diff_N > accuracy) {
+    Min = 0; Max = expected_N * 5
+    while(abs(diff_N) > accuracy) {
+      prod = runif(1, Min, Max)
       new_dbh_den <- dbh_den * prod
       diff_N <- expected_N - sum(new_dbh_den)
       if(diff_N > 0) {
-        prod <- prod * 1 + 1 * diff_N
+        Min = prod
       }else{
-        prod <- prod * 1 - 1 * diff_N
+        Max = prod
       }
-    } 
+    }
     return( dbh_den * prod )
   }
 }
