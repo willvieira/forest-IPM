@@ -232,17 +232,24 @@ init_pop <- function(
 
     Min = 0; Max = N * 5
     while(abs(diff_N) > accuracy) {
-      prod = runif(1, Min, Max)
-      new_dbh_den <- dbh_den * prod
+      fct = runif(1, Min, Max)
+      new_dbh_den <- dbh_den * fct
       diff_N <- N - sum(new_dbh_den)
       if(diff_N > 0) {
-        Min = prod
+        Min = fct
       }else{
-        Max = prod
+        Max = fct
       }
     }
-    N_out <- dbh_den * prod
+
+    # In case the generated size dist is already close to the expected N
+    if(exists('fct')) {
+      N_out <- dbh_den * fct
+    }else{
+      N_out <- dbh_den
+    }
   }
+
   return(
     list(
       meshpts = msh,
