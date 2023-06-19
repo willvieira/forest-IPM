@@ -75,19 +75,33 @@ ingrowth_lk <- function(
 # Full Kernel
 mkKernel = function(
   Nvec_intra, Nvec_inter,
-  delta_time, plot_size, Temp, Prec, pars,
+  delta_time, plotSize, Temp, Prec, pars,
   plot_random # vector of [1] growth, [2] mortality, and [3] recruitment ofsets
-){  
+){
   meshpts = Nvec_intra$meshpts
   h = Nvec_intra$h
 
   # compute competition metrics
-  BA_comp_intra <- size_to_BAcomp(meshpts, Nvec_intra$Nvec, plot_size)
-  BA_comp_inter <- size_to_BAcomp(Nvec_inter$meshpts, Nvec_inter$Nvec, plot_size)
-  BA_adult_sp <- BAind_to_BAplot(size_to_BAind(meshpts), Nvec_intra$Nvec, plot_size)
-  BA_adult <- BA_adult_sp +
-    BAind_to_BAplot(size_to_BAind(Nvec_inter$meshpts), Nvec_inter$Nvec, plot_size)
+  BA_comp_intra <- size_to_BAcomp(
+    N_intra = Nvec_intra,
+    plot_size = plotSize
+  )
+  BA_comp_inter <- size_to_BAcomp(
+    N_intra = Nvec_intra,
+    N_inter = Nvec_inter,
+    plot_size = plotSize
+  )
+  BAplot_intra <- size_to_BAplot(
+    N = Nvec_intra,
+    plot_size = plotSize
+  )
+  BAplot_inter <- size_to_BAplot(
+    N = Nvec_inter,
+    plot_size = plotSize
+  )
+  BAplot_total <- BAplot_intra + BAplot_inter
 
+  # kernel
   P <- h * outer(
     meshpts, meshpts,
     P_xEC,
@@ -97,12 +111,12 @@ mkKernel = function(
   F <- h * outer(
     meshpts, meshpts,
     ingrowth_lk,
-    delta_time, plot_size, BA_adult_sp, BA_adult, pars[['rec']], pars[['sizeIngrowth']], pars[['Rep']], plot_random[3]
+    delta_time, plotSize, BAplot_intra, BAplot_total, pars[['rec']], pars[['sizeIngrowth']], pars[['Rep']], plot_random[3]
   )
 
   K <- P + F
 
-  return(list(K = K, meshpts = meshpts, P = P, F = F))
+  return(list(K = K, P = P, F = F))
 }
 
 
