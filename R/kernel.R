@@ -72,32 +72,36 @@ ingrowth_lk <- function(
 # Kernel and functions around building the kernel
 #################################################################
 
-# Compute mesh points
-get_mesh <- function(L, U, h = 1)
-{
-  # mesh points
-  m <- length(seq(L, U, h))
-  meshpts <- L + ((1:m) - 1/2) * h
-
-  return( list(meshpts = meshpts, h = h))
-}
-
 # Full Kernel
 mkKernel = function(
-  meshpoints,
   Nvec_intra, Nvec_inter,
-  delta_time, plot_size, Temp, Prec, pars,
+  delta_time, plotSize, Temp, Prec, pars,
   plot_random # vector of [1] growth, [2] mortality, and [3] recruitment ofsets
 ){
-  meshpts = meshpoints$meshpts
-  h = meshpoints$h
+  meshpts = Nvec_intra$meshpts
+  h = Nvec_intra$h
 
   # compute competition metrics
-  BA_comp_intra <- size_to_BAcomp(meshpts, Nvec_intra, plot_size)
-  BA_comp_inter <- size_to_BAcomp(meshpts, Nvec_inter, plot_size)
-  BA_adult_sp <- BAind_to_BAplot(size_to_BAind(meshpts), Nvec_intra, plot_size)
-  BA_adult <- BAind_to_BAplot(size_to_BAind(meshpts), Nvec_intra + Nvec_inter, plot_size)
+  BA_comp_intra <- size_to_BAcomp(
+    N_intra = Nvec_intra,
+    plot_size = plotSize
+  )
+  BA_comp_inter <- size_to_BAcomp(
+    N_intra = Nvec_intra,
+    N_inter = Nvec_inter,
+    plot_size = plotSize
+  )
+  BAplot_intra <- size_to_BAplot(
+    N = Nvec_intra,
+    plot_size = plotSize
+  )
+  BAplot_inter <- size_to_BAplot(
+    N = Nvec_inter,
+    plot_size = plotSize
+  )
+  BAplot_total <- BAplot_intra + BAplot_inter
 
+  # kernel
   P <- h * outer(
     meshpts, meshpts,
     P_xEC,
@@ -107,12 +111,12 @@ mkKernel = function(
   F <- h * outer(
     meshpts, meshpts,
     ingrowth_lk,
-    delta_time, plot_size, BA_adult_sp, BA_adult, pars[['rec']], pars[['sizeIngrowth']], pars[['Rep']], plot_random[3]
+    delta_time, plotSize, BAplot_intra, BAplot_total, pars[['rec']], pars[['sizeIngrowth']], pars[['Rep']], plot_random[3]
   )
 
   K <- P + F
 
-  return(list(K = K, meshpts = meshpts, P = P, F = F))
+  return(list(K = K, P = P, F = F))
 }
 
 
@@ -171,30 +175,40 @@ getPars_sp <- function(sp, method, path = NULL)
 
 
 
-# Function to generate a smooth initial size distribution in
+# Function to generate meshpoints and a smooth initial size distribution in
 # function of expected population size N
 #' params: species specific parameters
-#' mshpts_h: objected generated from `get_mesh` function
-#' expected_N: approximated population size N expected for the initial size dist
+#' L: lower boundary of kernel
+#' h: intgration bin
+#' N: approximated population size N expected for the initial size dist
 #' accuracy: minimum accepted error difference between N and expected N
 #' meanSize: mean of lognormal distribution for size distribution
 #' sdSize: standard deviation of lognormal distribution for size distribution
 #' Both meanSize and sdSize parameters are in natural scale
 init_pop <- function(
-  params, mshpts, expected_N, accuracy = 0.001, meanSize = 130, sdSize = 1.8)
-{
-  msh <- mshpts$meshpts
+  params,
+  L,
+  h,
+  N,
+  accuracy = 0.001,
+  meanSize = 130,
+  sdSize = 1.8
+){
+  # Compute mesh points
+  Lmax <- round(params[['growth']]['Lmax'], 0)
+  m <- length(seq(L, Lmax, h))
+  msh <- L + ((1:m) - 1/2) * h
 
-  if(expected_N < 0)
+  if(N < 0)
   {
-    stop('Argument `expected_N` larger or equal than zero.')
+    stop('Argument `N` must be larger or equal than zero.')
   }
-  # In case `expected_N` equal zero, return empty dist vector
-  else if(expected_N == 0)
+  # In case `N` equal zero, return empty dist vector
+  else if(N == 0)
   {
-    return( rep(0, length(msh)) )
+    N_out <- rep(0, length(msh))
   }
-  # Generate smooth size dist in function of expected_N
+  # Generate smooth size dist in function of N
   else
   {
     # generate random individuals from the lognorm distribution
@@ -203,7 +217,7 @@ init_pop <- function(
         n = 1e4,
         min = plnorm(min(msh), log(meanSize), log(sdSize)),
         max = plnorm(
-          round(params[['growth']]['Lmax'], 0), log(meanSize), log(sdSize)
+          Lmax, log(meanSize), log(sdSize)
         )
       ),
       log(meanSize), log(sdSize)
@@ -214,19 +228,33 @@ init_pop <- function(
 
     # transform density distribution to approximate total pop size to
     # the expected N argument
-    diff_N <- expected_N - sum(dbh_den)
+    diff_N <- N - sum(dbh_den)
 
-    Min = 0; Max = expected_N * 5
+    Min = 0; Max = N * 5
     while(abs(diff_N) > accuracy) {
-      prod = runif(1, Min, Max)
-      new_dbh_den <- dbh_den * prod
-      diff_N <- expected_N - sum(new_dbh_den)
+      fct = runif(1, Min, Max)
+      new_dbh_den <- dbh_den * fct
+      diff_N <- N - sum(new_dbh_den)
       if(diff_N > 0) {
-        Min = prod
+        Min = fct
       }else{
-        Max = prod
+        Max = fct
       }
     }
-    return( dbh_den * prod )
+
+    # In case the generated size dist is already close to the expected N
+    if(exists('fct')) {
+      N_out <- dbh_den * fct
+    }else{
+      N_out <- dbh_den
+    }
   }
+
+  return(
+    list(
+      meshpts = msh,
+      Nvec = N_out,
+      h = h
+    )
+  )
 }
