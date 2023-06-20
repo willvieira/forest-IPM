@@ -56,9 +56,6 @@ dev.off()
 
 
 out_Ndiff <- out |>
-  mutate(
-    sp_pair = paste0(sp1, '_', sp2)
-  ) |>
   group_by(sp_pair, replication) |>
   mutate(
     diffN = N_sp1[year == max(year)] - N_sp2[year == max(year)]
@@ -122,3 +119,23 @@ parse_number(dir('simulations/species_pair/output/', pattern = 'RDS')) |>
     as.numeric(units = 'hours')
   ) |>
   hist()
+
+
+
+# distribution across species
+pdf( 
+  file = 'simulations/species_pair/N_diff_summary.pdf', 
+  width = 7, 
+  height = 9 
+)
+out_Ndiff |>
+  select(!contains('BA_')) |>
+  ggplot(aes(diffN, fct_reorder(sp1, diffN), fill = stat(x))) +
+    ggridges::geom_density_ridges_gradient() +
+    scale_fill_gradient2() + 
+    theme_minimal() + 
+    geom_vline(xintercept = 0, linetype = 2) +
+    ylab('') +
+    xlab('Difference in population size between the focal and all other species') + 
+    theme(legend.position = 'none')
+dev.off()
