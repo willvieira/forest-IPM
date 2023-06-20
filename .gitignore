@@ -37,3 +37,4 @@ rsconnect/
 data
 simulations/old
 simulations/*/output
+simulations/*/*.pdf
