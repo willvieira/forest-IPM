@@ -26,6 +26,11 @@ out <- parse_number(
   )
 
 # distribution of N equilibrium across species
+pdf(
+  file = 'simulations/N_equilibrium/N_star.pdf',
+  width = 7,
+  height = 10
+)
 out |>
   group_by(species_id) |>
   filter(year == max(year)) |>
@@ -34,8 +39,15 @@ out |>
     theme_minimal() +
     xlab('Population size') +
     ylab('')
+dev.off()
+
 
 # is population distribution at equilibirum stable?
+pdf(
+  file = 'simulations/N_equilibrium/N_over_time.pdf',
+  width = 16,
+  height = 14
+)
 out |>
   group_by(species_id) |>
   mutate(q80 = quantile(year, prob = 0.8)) |>
@@ -45,7 +57,7 @@ out |>
     facet_wrap(~species_id, scales = 'free') +
     theme_minimal() +
     theme(legend.position = 'none')
-
+dev.off()
 
 # # special case for 18086LIRTUL and 18048JUNVIR
 # out |>
