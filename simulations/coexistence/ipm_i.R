@@ -151,7 +151,7 @@ for(t in 2:pars$n_time)
     )
   )
 
-  if(t %% 10 == 0) {
+  if(t %% 10000 == 0) {
     mat_row <- mat_row + 1
     mat_sp1[mat_row, ] <- as.vector(Ntp1_sp1$Nvec)
     lambdas[mat_row] <- max(Re(eigen(Kt_sp1$K)$values))
@@ -263,7 +263,7 @@ for(t in 2:pars$n_time)
     )
   )
 
-  if(t %% 10 == 0) {
+  if(t %% 10000 == 0) {
     mat_row <- mat_row + 1
     mat_sp2[mat_row, ] <- as.vector(Ntp1_sp2$Nvec)
     lambdas[mat_row] <- max(Re(eigen(Kt_sp2$K)$values))
@@ -393,7 +393,7 @@ for(t in 2:pars$n_time)
     )
   )
 
-  if(t %% 10 == 0) {
+  if(t %% 10000 == 0) {
     mat_row <- mat_row + 1
     mat_sp1[mat_row, ] <- as.vector(Ntp1_sp1$Nvec)
     lambdas_sp1[mat_row] <- max(Re(eigen(Kt_sp1$K)$values))

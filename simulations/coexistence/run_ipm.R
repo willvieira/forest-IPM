@@ -62,8 +62,8 @@ for(i in 0:i_max)
 {
   bash_file <- paste0('#!/bin/bash
 #SBATCH --account=def-dgravel
-#SBATCH -t 1-0:00:00
-#SBATCH --mem-per-cpu=1000M
+#SBATCH -t 1-10:00:00
+#SBATCH --mem-per-cpu=3000M
 #SBATCH --ntasks=1
 #SBATCH --job-name=ipm', i, '
 #SBATCH --mail-user=willian.vieira@usherbrooke.ca
