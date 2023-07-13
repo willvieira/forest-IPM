@@ -30,7 +30,9 @@ library(tidyverse)
 ######################################################
 
 # Env variables
-array_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID'))
+# Env variables
+batch_id <- as.numeric(Sys.getenv('BATCH'))
+array_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID')) + (10000 * batch_id)
 # csv variables
 pars <- read_csv('simulation_pars.csv')[array_id, ]
 # seed
