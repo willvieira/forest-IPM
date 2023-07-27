@@ -230,3 +230,71 @@ out |>
     lab()
 
 
+## Compute alpha_ii with the equation 1/BA*
+p1 <-out |>
+  filter(sp == 'sp1' & subsim == 'subsim1') |>
+  left_join(
+    pars_sim |>
+      mutate(
+        sim = row_number(),
+        sp_pair = paste0(sp1, '_', sp2)
+      ) |>
+      select(
+        !c(n_time, deltaTime, param_method, seed)
+      )
+  ) |>
+  as_tibble() |>
+  mutate(
+    K = 1/BA_eq
+  ) |>
+  filter(K < quantile(K, probs = 0.925)) |>
+  left_join(
+    read_csv('data/species_id.csv') |>
+      select(species_id_old, species_name),
+    by = c('sp1' = 'species_id_old')
+  ) |>
+  ggplot(aes(K, fct_reorder(species_name, K))) +
+    ggridges::geom_density_ridges2(color = rgb(0.3,0.5,0.4,0.6), fill = rgb(0.3,0.5,0.4,0.6), alpha = 0.8) +
+    theme_classic() +
+    ylab('Invader species') +
+    xlab(expression(alpha[ii])) +
+    theme(
+      axis.text.y = element_text(face = "italic")
+    )
+
+p2 <- out |>
+  filter(sp == 'sp1' & subsim == 'subsim1') |>
+  left_join(
+    pars_sim |>
+      mutate(
+        sim = row_number(),
+        sp_pair = paste0(sp1, '_', sp2)
+      ) |>
+      select(
+        !c(n_time, deltaTime, param_method, seed)
+      )
+  ) |>
+  as_tibble() |>
+  mutate(
+    K = 1/BA_eq
+  ) |>
+  filter(K < quantile(K, probs = 0.9)) |>
+  left_join(
+    read_csv('data/species_id.csv') |>
+      select(species_id_old, shade),
+    by = c('sp1' = 'species_id_old')
+  ) |>
+  mutate(
+    shade = factor(shade, levels = c('tolerant', 'intermediate', 'intolerant'))
+  ) |>
+  ggplot(aes(shade, K)) +
+    geom_boxplot(
+      alpha = 0.8,
+      fill = c("#87bc45", "#edbf33", "#ea5545")
+    ) +
+    theme_minimal() +
+    xlab('Shade tolerance') +
+    ylab(expression(alpha[ii]))
+
+ggpubr::ggarrange(p1, p2, ncol = 2)
+
