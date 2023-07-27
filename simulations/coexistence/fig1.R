@@ -194,3 +194,39 @@ p2 <- sens |>
 
 ggpubr::ggarrange(p1, p2, ncol = 2)
 
+
+
+# correlation between BA sensitivity and a_ij
+out |>
+  filter(sp == 'sp1') |>
+  select(sim, subsim, BA_eq) |>
+  pivot_wider(
+    names_from = subsim,
+    values_from = BA_eq
+  ) |>
+  mutate(
+    # first deal with 0 BA or values too close to it
+    subsim2 = ifelse(subsim2 < 0.1, 0.1, subsim2),
+    subsim1 = ifelse(subsim1 < 0.1, 0.1, subsim1),
+    a_ii = 1/subsim1,
+    a_ij = log(subsim2/subsim1),
+    sens = (subsim1 - subsim2)/subsim1
+  ) |>
+  left_join(
+    pars_sim |>
+      mutate(
+        sim = row_number(),
+        sp_pair = paste0(sp1, '_', sp2)
+      ) |>
+      select(
+        !c(n_time, deltaTime, param_method, seed)
+      )
+  ) |>
+  ggplot(aes(sens, a_ij)) +
+    geom_point() +
+    theme_minimal() +
+    xlab('BA sensitivity') +
+    ylab(expression(alpha[ij])) +
+    lab()
+
+
