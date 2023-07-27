@@ -130,3 +130,67 @@ sens |>
     xlab('Resident species') +
     ylab('Invader species')
 
+
+# Sensitivity distribution of species i across all other species
+p1 <- sens |>
+  select(sp1, sp2, sens_BA) |>
+  filter(
+    sens_BA > quantile(sens_BA, probs = 0.001) &
+    sens_BA < quantile(sens_BA, probs = 0.999)
+  ) |>
+  left_join(
+    read_csv('data/species_id.csv') |>
+      select(!species_id_new),
+    by = c('sp1' = 'species_id_old')
+  ) |>
+  left_join(
+    read_csv('data/species_id.csv') |>
+      rename(shade_sp2 = shade) |>
+      select(species_id_old, shade_sp2),
+    by = c('sp2' = 'species_id_old')
+  ) |>
+  mutate(
+    species_name = fct_reorder(species_name, sens_BA),
+    shade_sp2 = factor(shade_sp2, levels = c('tolerant', 'intermediate', 'intolerant'))
+  ) |>
+  ggplot(aes(sens_BA, species_name, fill = shade_sp2)) +
+    ggridges::geom_density_ridges2(
+      color = 'transparent',
+      alpha = 0.7
+    ) +
+    scale_fill_manual(
+      values = c("#87bc45", "#edbf33", "#ea5545")
+    ) +
+    theme_classic() +
+    ylab('Invader species') +
+    xlab('Basal area sensitivity') +
+    theme(
+      axis.text.y = element_text(face = "italic"),
+      legend.position = 'top'
+    ) +
+    labs(
+      fill = 'Shade tolerance\nof resident species'
+    )
+
+p2 <- sens |>
+  select(sp1, sens_BA) |>
+  filter(
+    sens_BA > quantile(sens_BA, probs = 0.001) &
+    sens_BA < quantile(sens_BA, probs = 0.999)
+  ) |>
+  left_join(
+    read_csv('data/species_id.csv') |>
+      select(!species_id_new),
+    by = c('sp1' = 'species_id_old')
+  ) |>
+  mutate(
+    shade = factor(shade, levels = c('tolerant', 'intermediate', 'intolerant'))
+  ) |>
+  ggplot(aes(shade, sens_BA)) +
+    geom_boxplot(alpha = 0.8, fill = c("#87bc45", "#edbf33", "#ea5545")) +
+    theme_minimal() +
+    xlab('Shade tolerance of invader species') +
+    ylab('Basal area sensitivity')
+
+ggpubr::ggarrange(p1, p2, ncol = 2)
+
