@@ -55,23 +55,25 @@ size_to_BAcomp <- function(
 	)
 }
 
-
-# Deprecated function
-dbh_to_meshpts <- function(
+#' Function to convert individual size observations to size distribution respecting the meshpoints of the focal species (Kernel dimension)
+#' dbh: vector of size in mm for each individual tree
+#' N_intra: output of `init_pop` function
+dbh_to_sizeDist <- function(
 	dbh,
-	mesh
+	N_intra
 ){
-	# empty mshpts to count number of individuals per size class
-	mesh_dbh <- rep(0, length(mesh))
+	dbh <- sort(dbh)
+	N_out <- N_intra
+	N_out$Nvec <- rep(0, length(N_out$Nvec))
 
 	# approximate each individual size to its class
-	dbh_class <- cut(dbh, breaks = mesh, labels = F)
+	dbh_class <- cut(dbh, breaks = N_intra$meshpts, labels = F)
 
 	# count number of ind dbh at each class
 	dbh_count <- table(dbh_class)
 
 	# fill meshpts with the count of each class
-	mesh_dbh[as.numeric(names(dbh_count))] <- dbh_count
+	N_out$Nvec[as.numeric(names(dbh_count))] <- dbh_count
 
-	return( mesh_dbh)
+	return( N_out )
 }
