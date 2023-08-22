@@ -67,7 +67,7 @@ dbh_to_sizeDist <- function(
 	N_out$Nvec <- rep(0, length(N_out$Nvec))
 
 	# approximate each individual size to its class
-	dbh_class <- cut(dbh, breaks = N_intra$meshpts, labels = F)
+	dbh_class <- cut(dbh, breaks = N_intra$meshpts, labels = F, include.lowest = TRUE)
 
 	# count number of ind dbh at each class
 	dbh_count <- table(dbh_class)
