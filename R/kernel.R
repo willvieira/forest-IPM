@@ -73,6 +73,7 @@ ingrowth_lk <- function(
 #################################################################
 
 # Full Kernel
+#' @export
 mkKernel = function(
   Nvec_intra, Nvec_inter,
   delta_time, plotSize, Temp, Prec, pars,
@@ -125,6 +126,7 @@ mkKernel = function(
 #' sp: species_id
 #' method: either `mean` or `random`. `Mean` is the posterior mean and `random` is a single draw from the posterior mean
 #' path: default is set to 'data/parameters'
+#' @export
 getPars_sp <- function(sp, method, path = NULL)
 {
   pars_path <- ifelse(
@@ -185,6 +187,7 @@ getPars_sp <- function(sp, method, path = NULL)
 #' meanSize: mean of lognormal distribution for size distribution
 #' sdSize: standard deviation of lognormal distribution for size distribution
 #' Both meanSize and sdSize parameters are in natural scale
+#' @export
 init_pop <- function(
   params,
   L,

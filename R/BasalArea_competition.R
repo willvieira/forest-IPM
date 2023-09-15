@@ -15,7 +15,7 @@ size_to_BAind <- function(
 	return( indBA_vec )
 }
 
-
+#' @export
 size_to_BAplot <- function(
 	N,
 	plot_size
@@ -58,6 +58,7 @@ size_to_BAcomp <- function(
 #' Function to convert individual size observations to size distribution respecting the meshpoints of the focal species (Kernel dimension)
 #' dbh: vector of size in mm for each individual tree
 #' N_intra: output of `init_pop` function
+#' @export
 dbh_to_sizeDist <- function(
 	dbh,
 	N_intra

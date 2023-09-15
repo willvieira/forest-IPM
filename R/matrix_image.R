@@ -1,3 +1,4 @@
+#' @export
 matrix.image <- function(A,
                          x = NULL,
                          y = NULL,
