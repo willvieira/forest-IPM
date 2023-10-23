@@ -50,10 +50,10 @@ P_xEC = function(
 
 # Probability function for ingrowth
 ingrowth_lk <- function(
-  size_t1, size_t0, delta_time, plot_size, BA_adult_sp, BA_adult, parsIngrowth, parsSizeIngrowth, plot_random
+  size_t1, size_t0, delta_time, plot_size, BA_adult_sp, BA_adult, Temp, Prec, parsIngrowth, parsSizeIngrowth, plot_random
 ){
   ingrowth_prob = ingrowth_f(
-    parsIngrowth, delta_time, plot_size, BA_adult_sp, BA_adult, plot_random
+    parsIngrowth, delta_time, plot_size, BA_adult_sp, BA_adult, Temp, Prec, plot_random
   ) *
   truncnorm::dtruncnorm(
     size_t1,
@@ -113,7 +113,7 @@ mkKernel = function(
   F <- h * outer(
     meshpts, meshpts,
     ingrowth_lk,
-    delta_time, plotSize, BAplot_intra, BAplot_total, pars[['rec']], pars[['sizeIngrowth']], plot_random[3]
+    delta_time, plotSize, BAplot_intra, BAplot_total, Temp, Prec, pars[['rec']], pars[['sizeIngrowth']], plot_random[3]
   )
 
   K <- P + F
