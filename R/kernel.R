@@ -165,7 +165,8 @@ getPars_sp <- function(
           filter(par != 'lp__') |>
           group_by(par) |>
           reframe(value = mean(value)) |>
-          pivot_wider(names_from = 'par')
+          pivot_wider(names_from = 'par') |>
+          as_vector()
       )
   }else if(method == 'random') {
     pars_dir |>
@@ -174,7 +175,8 @@ getPars_sp <- function(
           filter(par != 'lp__') |>
           filter(iter == sample(1:4000, 1)) |>
           select(!iter) |>
-          pivot_wider(names_from = 'par')          
+          pivot_wider(names_from = 'par') |>
+          as_vector()      
       )
   }else{
     stop('`param_method` parameter must be either `mean` or `random`')
