@@ -359,11 +359,3 @@ dir.create(file.path(sim_path, 'output_processed'))
 saveRDS(lambdas, file.path(sim_path, 'output_processed', 'lambdas.RDS'))
 saveRDS(outRF_pars, file.path(sim_path, 'output_processed', 'outRF_pars.RDS'))
 saveRDS(outRF_cov, file.path(sim_path, 'output_processed', 'outRF_cov.RDS'))
-
-  list(
-    lambdas = lambdas,
-    outRF_pars = out_dt
-    outRF_cov = out_pred
-  ),
-  file.path(sim_path, 'output_processed', 'output.RDS')
-)
