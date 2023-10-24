@@ -1,0 +1,5 @@
+_data.path
+*.pdf
+output_complete.RDS
+simulation_pars.csv
+N_dist
