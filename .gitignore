@@ -38,3 +38,4 @@ data/parameters
 simulations/old
 simulations/*/output
 simulations/*/*.pdf
+_data.path
