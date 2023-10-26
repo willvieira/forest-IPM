@@ -88,3 +88,75 @@ girafe(
   )
 )
 
+
+
+
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Climate effect
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+lambdas |>
+  filter(species_id %in% spIds$species_id_old) |>
+  filter(sim == 'climate') |>
+  mutate(
+    var = case_match(
+      var,
+      'temp' ~ 'Temperature',
+      'prec' ~ 'Precipitation'
+    ),
+    comp = case_match(
+      comp,
+      'high' ~ 'High competition',
+      'low' ~ 'Low competition'
+    ),
+    comp = factor(comp, levels = c('Low competition', 'High competition'))
+  ) |>
+  left_join(
+    spIds,
+    by = c('species_id' = 'species_id_old')
+  ) |>
+  group_by(species_name, var, comp, clim) |>
+  reframe(
+    mean_lambda = mean(lambda),
+    sd_lambda = sd(lambda),
+    ci_9 = mean_lambda + qt( c(0.9), n() - 1) * sd_lambda,
+    ci_1 = mean_lambda + qt( c(0.1), n() - 1) * sd_lambda
+  ) ->
+clim_dt
+
+clim_dt |>
+  filter(var == 'Temperature') |>
+  ggplot() +
+  aes(clim, mean_lambda) +
+  geom_ribbon_interactive(aes(ymin = ci_1, ymax = ci_9), alpha = 0.3,color=NA) +
+  geom_line_interactive() +
+  aes(tooltip = species_name, data_id = species_name) +
+  facet_grid(~comp) +
+  geom_hline(yintercept = 1, linetype = 2, alpha = 0.5) +
+  theme_classic() +
+  labs(
+    x = 'Mean annual temperature (scaled)',
+    y = expression('ln('~lambda~')')
+  ) +
+  theme(legend.position = 'none') ->
+p_temp
+
+clim_dt |>
+  filter(var == 'Precipitation') |>
+  ggplot() +
+  aes(clim, mean_lambda) +
+  geom_ribbon_interactive(aes(ymin = ci_1, ymax = ci_9), alpha = 0.3,color=NA) +
+  geom_line_interactive() +
+  aes(tooltip = species_name, data_id = species_name) +
+  facet_grid(~comp) +
+  geom_hline(yintercept = 1, linetype = 2, alpha = 0.5) +
+  theme_classic() +
+  labs(
+    x = 'Mean annual precipitation (scaled)',
+    y = expression('ln('~lambda~')')
+  ) +
+  theme(legend.position = 'none') ->
+p_prec
