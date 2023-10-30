@@ -20,11 +20,11 @@ spIds <- read_csv(
   paste0(readLines('_data.path'), 'species_id.csv')
 )
 
-sp_analysis <- c('NAQUEPRI', '183302PICMAR', '183319PINBAN', '19447QUEVEL', '32931FRAAME')
+sp_analysis <- c('NAQUEPRI', '183302PICMAR', '183319PINBAN', '19447QUEVEL', '32931FRAAME', '19408QUERUB')
 
-temp_mean  <- c(7.8, -3.8, 7.7, 17.4, 19.0)
+temp_mean  <- c(7.8, -3.8, 7.7, 17.4, 19.0, 16.4)
 temp_sd <- seq(0.1, 1.5, 0.2)
-BA_comp <- c(51, 41.8, 31.5, 44.3, 41.1)
+BA_comp <- c(51, 41.8, 31.5, 44.3, 41.1, 53.4)
 BA_sd <- seq(1, 8, 1)
 
 
@@ -214,6 +214,12 @@ new_BA_sim |>
   bind_rows() |>
   left_join(
     pars |>
+      left_join(
+        tibble(
+          species_id = sp_analysis,
+          temp = (temp_mean - temp_rg[1])/(temp_rg[2] - temp_rg[1])
+        )
+      ) |>
       select(!lambda)
   ) |>
   mutate(arrayID = (1:n()) + (nrow(pars_sim) + nrow(temp_sim))) ->
@@ -228,7 +234,7 @@ new_BA_sim |>
     temp_sim,
     by = c('species_id', 'replication', 'arrayID')
   ) |>
-  mutate(arrayID = (1:n()) + (nrow(pars_sim) + nrow(temp_sim) + BA_sim)) ->
+  mutate(arrayID = (1:n()) + (nrow(pars_sim) + nrow(temp_sim) + nrow(BA_sim))) ->
 BAtemp_sim
 
 

@@ -103,11 +103,12 @@ temp_sim |>
   mutate(
     sim = paste0('paramater + ', sim),
     sim = factor(sim, levels = c('paramater + climate', 'paramater + competition', 'paramater + climate + competition'))
-  ) ->
+  ) |>
+  filter(species_name %in% c('Quercus prinus', 'Quercus rubra')) ->
 lambda_dt
 
 lambda_dt |>
-  filter(lambda > quantile(lambda, 0.001)) |>
+  # filter(lambda > quantile(lambda, 0.001)) |>
   ggplot() +
   aes(noise_size, log(lambda)) +
   aes(fill = species_name) +
@@ -115,7 +116,7 @@ lambda_dt |>
   stat_slab(alpha = 0.6) +
   geom_hline(yintercept = 0, alpha = 0.4, linetype = 2) +
   scale_fill_manual(
-    values = c('#7fc97f', '#beaed4', '#fdc086', '#e78ac3', '#386cb0')
+    values = c('#d8b365', '#5ab4ac')
   ) +
   theme_classic() +
   labs(
@@ -132,12 +133,16 @@ lambda_dt |>
 
 lambda_dt |>
   group_by(species_name, sim, noise_size) |>
-  reframe(lambda_sd = sd(lambda)) |>
+  reframe(
+    lambda_mean = mean(lambda),
+    lambda_sd = sd(lambda)
+  ) |>
+  # pivot_longer(cols = contains('lambda')) |>
   ggplot() +
   aes(noise_size, lambda_sd) +
   aes(group = sim, color = sim) +
-  # geom_path(linewidth = .8, alpha = 0.8) +
-  geom_smooth(level = NA) +
+  geom_path(linewidth = .8, alpha = 0.3) +
+  geom_smooth(level = NA, alpha = 0) +
   facet_wrap(~species_name, scales = 'free') +
   scale_color_manual(
     values = c('#7fc97f', '#fb8072', '#fdc086')
@@ -168,14 +173,14 @@ area_thr <- function(x, threshold = 1, normalized = TRUE) {
 }
 
 lambda_dt |>
-  filter(species_name != 'Picea mariana') |>
+  # filter(species_name != 'Picea mariana') |>
   group_by(species_name, sim, noise_size) |>
   reframe(A = area_thr(lambda)) |>
   ggplot() +
   aes(noise_size, A) +
   aes(group = sim, color = sim) +
-  # geom_path(linewidth = .8, alpha = 0.8) +
-  geom_smooth(level = NA) +
+  geom_path(linewidth = .8, alpha = 0.25) +
+  geom_smooth(level = NA, alpha = 0) +
   facet_wrap(~species_name, scales = 'free') +
   scale_color_manual(
     values = c('#7fc97f', '#fb8072', '#fdc086')
@@ -193,10 +198,7 @@ lambda_dt |>
     legend.position = 'top'
   )
 
-  
 
 # save processed data
 dir.create(file.path(sim_path, 'output_processed'))
-saveRDS(lambdas, file.path(sim_path, 'output_processed', 'lambdas.RDS'))
-saveRDS(outRF_pars, file.path(sim_path, 'output_processed', 'outRF_pars.RDS'))
-saveRDS(outRF_cov, file.path(sim_path, 'output_processed', 'outRF_cov.RDS'))
+saveRDS(lambda_dt, file.path(sim_path, 'output_processed', 'lambdas.RDS'))
