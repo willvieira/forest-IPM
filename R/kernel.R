@@ -183,6 +183,28 @@ getPars_sp <- function(
   }
 }
 
+# Function to tranform rowwise tibble of parameters in list format
+# Which is the current way of passing parameters to the IPM
+pars_to_list <- function(pars)
+{
+  pars |>
+    select(contains('.')) |>
+    pivot_longer(cols = everything()) |>
+    mutate(
+      vr = str_replace(name, '\\..*', ''),
+      par = str_replace(name, paste0(vr, '.'), '')
+    ) |>
+    select(!name) |>
+    group_split(vr) %>%
+    # fuck tidyverse for not wanting to implement an argument to keep a named list
+    set_names(map_chr(., ~.x$vr[1])) |>
+    map(
+      ~.x |>
+        select(!vr) |>
+        pivot_wider(names_from = par) |>
+        as_vector()
+    )
+}
 
 
 # Function to generate meshpoints and a smooth initial size distribution in
