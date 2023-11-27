@@ -192,7 +192,13 @@ pars_to_list <- function(pars)
     pivot_longer(cols = everything()) |>
     mutate(
       vr = str_replace(name, '\\..*', ''),
-      par = str_replace(name, paste0(vr, '.'), '')
+      par = str_replace(name, paste0(vr, '.'), ''),
+      # some code uses 'recruit' instead of 'rec'
+      vr = case_match(
+        vr,
+        'recruit' ~ 'rec',
+        .default = vr
+      )
     ) |>
     select(!name) |>
     group_split(vr) %>%
