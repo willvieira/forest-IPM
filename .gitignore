@@ -39,3 +39,7 @@ simulations/old
 simulations/*/output
 simulations/*/*.pdf
 _data.path
+
+# ignore some simulations 
+simulations/lambda_plotv*
+simulations/par.mPop_effect
