@@ -37,8 +37,8 @@ rsconnect/
 data/parameters
 simulations/old
 simulations/*/output
-simulations/*/*.pdf
-simulations/*/*.png
+*.pdf
+*.png
 _data.path
 
 # ignore some simulations 
