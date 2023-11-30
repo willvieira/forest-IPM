@@ -38,6 +38,7 @@ data/parameters
 simulations/old
 simulations/*/output
 simulations/*/*.pdf
+simulations/*/*.png
 _data.path
 
 # ignore some simulations 
