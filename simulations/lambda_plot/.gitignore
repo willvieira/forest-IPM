@@ -1,0 +1,7 @@
+_data.path
+*.pdf
+simulation_pars.RDS
+plot_parameters
+pop_pars.RDS
+final_output.RDS
+dbh_range.RDS
