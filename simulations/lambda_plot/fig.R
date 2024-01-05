@@ -21,32 +21,25 @@ sim_path <- file.path('simulations', 'lambda_plot')
 sim_pars <- readRDS(file.path(sim_path, 'simulation_pars.RDS'))
 
 # output
-sim_out <- readRDS(file.path(sim_path, 'final_output.RDS'))
+sim_out <- readRDS(file.path(sim_path, 'final_outputv2.RDS'))
 
 # data for latitude - longitude
 treeData <- readRDS(
     paste0(readLines('_data.path'), 'treeData.RDS')
   ) |>
   filter(species_id %in% unique(sim_pars$species_id)) |>
+  group_by(species_id) |>
+  mutate(
+    mid_pos = (max(bio_01_mean, na.rm=TRUE) + min(bio_01_mean, na.rm=TRUE))/2,
+    plot_pos = ifelse(bio_01_mean < mid_pos, 'Cold range', 'Hot range')
+  ) |>
   group_by(species_id, plot_id) |>
   reframe(
     latitude = unique(latitude),
-    longitude = unique(longitude)
+    longitude = unique(longitude),
+    plot_pos = unique(plot_pos)
   ) ->
-plot_position
-
-# merge pars with output
-sim_out |>
-  left_join(
-    sim_pars |>
-      ungroup() |>
-      mutate(array_id = row_number()) |>
-      select(species_id, plot_id, year_measured, plot_size, array_id)
-  ) |>
-  mutate(sim = factor(sim)) |>
-  select(!array_id) |>
-  left_join(plot_position) ->
-out
+  plot_position
 
 # load species info
 spIds <- read_csv(file.path(readLines('_data.path'), 'species_id.csv')) |>
@@ -60,7 +53,7 @@ spIds <- read_csv(file.path(readLines('_data.path'), 'species_id.csv')) |>
       )
     )
   ) |>
-  filter(species_id_old %in% unique(out$species_id)) |>
+  filter(species_id_old %in% unique(sim_pars$species_id)) |>
   select(species_id_old, species_name) |>
   rename(species_id = species_id_old)
 
@@ -77,27 +70,36 @@ area_thr <- function(x, threshold = 1) {
   sum( (den_weight/sum(den_weight))[dd$x < threshold] )
 }
 
-out |>
-  mutate(lambda = log(lambda)) |>
-  group_by(species_id, plot_id, year_measured, sim) |>
+sim_out |>
   mutate(
+    lambda = log(lambda),
+    sim = factor(sim),
+    cond = factor(cond)
+  ) |>
+  group_by(array_id, sim, cond) |>
+  reframe(
+    temp = mean(temp),
     mean_lambda = mean(lambda),
     sd_lambda = sd(lambda),
     sd_temp = mean(temp_sd),
     ext = area_thr(lambda, threshold = 0)
-  ) |>
-  slice_head(n = 1) ->
-out_summ
+  ) ->
+sim_out
 
-# group plots as bellow or above the center of the distribution (50% quantile)
-out_summ |>
-  group_by(species_id) |>
-  mutate(
-    plot_pos = ifelse(temp < quantile(temp, 0.5), 'Cold range', 'Hot range')
-  ) |>
-  group_by(species_id, plot_id, year_measured, sim) ->
-out_summ
 
+# add metapars
+sim_out |>
+  left_join(
+    sim_pars |>
+      ungroup() |>
+      mutate(array_id = row_number()) |>
+      select(species_id, plot_id, array_id)
+  ) |>
+  left_join(
+    plot_position |>
+      select(species_id, plot_id, plot_pos)
+  ) ->
+sim_out
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,7 +111,7 @@ out_summ
 # Delta average lambda from sim1 to sim2 and sim3
 
 # get delta diff for average lambda, sd lambda, and ext
-out_summ |>
+sim_out |>
   group_by(species_id, plot_id, year_measured) |>
   mutate(
     d_meanLambda_sim2 = mean_lambda[sim == 2] - mean_lambda[sim == 1],
@@ -278,8 +280,9 @@ vars_name <- c(expression(bar(lambda)), expression(sigma[lambda]), 'Extinction r
 for(var in 1:length(vars_to_plot))
 {
   print(
-  out_summ |>
-  # filter(species_id %in% '18032ABIBAL') |>
+  sim_out |>
+    filter(cond == 1) |>
+    # filter(species_id %in% '18032ABIBAL') |>
     left_join(spIds) |>
     ggplot() +
     aes(temp, !! rlang::sym(vars_to_plot[var])) +
@@ -291,7 +294,29 @@ for(var in 1:length(vars_to_plot))
     labs(
       x = 'Mean annual temperature (°C)',
       y = vars_name[var],
-      color = 'Simulation'
+      color = 'Simulation (cond == 1)'
+    ) +
+    theme(
+      legend.position = 'top',
+      axis.text.y = element_text(face = 'italic')
+    )
+  )
+  print(
+  sim_out |>
+    filter(cond == 2) |>
+    # filter(species_id %in% '18032ABIBAL') |>
+    left_join(spIds) |>
+    ggplot() +
+    aes(temp, !! rlang::sym(vars_to_plot[var])) +
+    aes(color = sim) +
+    facet_wrap(~species_name, scales = 'free') +
+    geom_smooth() +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.8) +
+    theme_classic() +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = vars_name[var],
+      color = 'Simulation (cond == 2)'
     ) +
     theme(
       legend.position = 'top',
@@ -303,7 +328,8 @@ for(var in 1:length(vars_to_plot))
 for(var in 1:length(vars_to_plot))
 {
   print(
-  out_summ |>
+  sim_out |>
+    filter(cond == 1) |>
   # filter(species_id %in% '18032ABIBAL') |>
     left_join(spIds) |>
     ggplot() +
@@ -316,7 +342,29 @@ for(var in 1:length(vars_to_plot))
     labs(
       x = 'Mean annual temperature (°C)',
       y = vars_name[var],
-      color = 'Simulation'
+      color = 'Simulation (cond == 1)'
+    ) +
+    theme(
+      legend.position = 'top',
+      axis.text.y = element_text(face = 'italic')
+    )
+  )
+  print(
+  sim_out |>
+    filter(cond == 2) |>
+  # filter(species_id %in% '18032ABIBAL') |>
+    left_join(spIds) |>
+    ggplot() +
+    aes(temp, !! rlang::sym(vars_to_plot[var])) +
+    aes(color = sim, group=interaction(sim, plot_pos)) +
+    facet_wrap(~species_name, scales = 'free_y') +
+    geom_smooth(method = 'lm') +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.8) +
+    theme_classic() +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = vars_name[var],
+      color = 'Simulation (cond == 2)'
     ) +
     theme(
       legend.position = 'top',
@@ -325,9 +373,10 @@ for(var in 1:length(vars_to_plot))
   )
 }
 
+
 # temperature variance
-out_summ |>
-  filter(sim == 2) |>
+sim_out |>
+  filter(sim == 1 & cond == 1) |>
   left_join(spIds) |>
   ggplot() +
   aes(temp, sd_temp) +
@@ -356,8 +405,8 @@ dev.off()
 
 
 # slope for each species-model combination
-out_summ |>
-  group_by(species_id, plot_pos, sim) |>
+sim_out |>
+  group_by(species_id, plot_pos, sim, cond) |>
   select(temp, mean_lambda, sd_lambda, ext, sd_temp) |>
   mutate(
     ext = case_when(
@@ -389,17 +438,15 @@ out_summ |>
   mutate(
     sim = factor(case_match(
       as.numeric(sim),
-      1 ~ 'Parameter',
-      2 ~ 'Param + environment',
-      3 ~ 'Param + envir + competition'
+      1 ~ 'Condition',
+      2 ~ 'Condition +\nparameter'
     ))
-  ) |>
-  filter(sim %in% c('Parameter', 'Param + environment')) ->
+  ) ->
 plot_data
 
 
 plot_data |>
-  filter(sim == 'Parameter') |>
+  filter(sim == 'Condition' & cond == 2) |>
   ggplot() +
   aes(coeffs_lambda, coeffs_ext) +
   aes(color = sim, fill = sim) +
@@ -418,18 +465,19 @@ plot_data |>
   labs(
     x = expression('Slope ('~bar(lambda)%~%~textstyle(Mean~annual~temperature)~')'),
     y = expression('Slope ('~textstyle(Extinction~risk)%~%~textstyle(Mean~annual~temperature)~')'),
-    color = 'Uncertainty simulation',
-    fill = 'Uncertainty simulation'
+    color = 'Variability',
+    fill = 'Variability'
   ) +
-  xlim(-0.075, 0.075) +
-  ylim(-1, 1) + 
-  annotate(geom = 'text', x = -0.06, y = 0.95, label = expression(lambda %down% E %up% '')) +
-  annotate(geom = 'text', x = 0.06, y = 0.95, label = expression(lambda %up% E %up% '')) +
-  annotate(geom = 'text', x = -0.06, y = -0.95, label = expression(lambda %down% E %down% '')) +
-  annotate(geom = 'text', x = 0.06, y = -0.95, label = expression(lambda %up% E %down% '')) ->
+  xlim(-0.04, 0.04) +
+  ylim(-2.5, 2.5) +
+  annotate(geom = 'text', x = -0.035, y = 2.2, label = expression(lambda %down% E %up% '')) +
+  annotate(geom = 'text', x = 0.035, y = 2.2, label = expression(lambda %up% E %up% '')) +
+  annotate(geom = 'text', x = -0.035, y = -2.2, label = expression(lambda %down% E %down% '')) +
+  annotate(geom = 'text', x = 0.035, y = -2.2, label = expression(lambda %up% E %down% '')) ->
 p1
 
 plot_data |>
+  filter(cond == 2) |>
   ggplot() +
   aes(coeffs_lambda, coeffs_ext) +
   aes(color = sim, fill = sim) +
@@ -448,35 +496,25 @@ plot_data |>
   labs(
     x = expression('Slope ('~bar(lambda)%~%~textstyle(Mean~annual~temperature)~')'),
     y = expression('Slope ('~textstyle(Extinction~risk)%~%~textstyle(Mean~annual~temperature)~')'),
-    color = 'Uncertainty simulation',
-    fill = 'Uncertainty simulation'
+    color = 'Variability',
+    fill = 'Variability'
   ) +
-  xlim(-0.075, 0.075) +
-  ylim(-1, 1) + 
-  annotate(geom = 'text', x = -0.06, y = 0.95, label = expression(lambda %down% E %up% '')) +
-  annotate(geom = 'text', x = 0.06, y = 0.95, label = expression(lambda %up% E %up% '')) +
-  annotate(geom = 'text', x = -0.06, y = -0.95, label = expression(lambda %down% E %down% '')) +
-  annotate(geom = 'text', x = 0.06, y = -0.95, label = expression(lambda %up% E %down% '')) ->
+  xlim(-0.04, 0.04) +
+  ylim(-2.5, 2.5) +
+  annotate(geom = 'text', x = -0.035, y = 2.2, label = expression(lambda %down% E %up% '')) +
+  annotate(geom = 'text', x = 0.035, y = 2.2, label = expression(lambda %up% E %up% '')) +
+  annotate(geom = 'text', x = -0.035, y = -2.2, label = expression(lambda %down% E %down% '')) +
+  annotate(geom = 'text', x = 0.035, y = -2.2, label = expression(lambda %up% E %down% '')) ->
 p2
 
 p2 +
   geom_text_repel(aes(color = NULL, label = species_name), size = rel(1.8), fontface = 'italic') ->
 p3
 
-p2 +
-  aes(color = coeffs_sd, shape = sim) +
-  scale_colour_gradient2() +
-  labs(
-    fill = 'Uncertainty simulation',
-    shape = 'Uncertainty simulation',
-    color = expression(sigma[lambda]) 
-  ) ->
-p4
-
 
 pdf(
-  file = file.path(sim_path, 'lambda_slope2.pdf'),
+  file = file.path(sim_path, 'lambda_slope.pdf'),
   width = 10, height = 5
 )
-for(i in 1:4) print(get(paste0('p', i)))
+for(i in 1:3) print(get(paste0('p', i)))
 dev.off()
