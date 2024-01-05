@@ -1,0 +1,7 @@
+_data.path
+*.pdf
+simulation_pars.RDS
+out_species
+output
+output_bcp
+out_diag.RDS
