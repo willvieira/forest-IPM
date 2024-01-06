@@ -624,93 +624,102 @@ out_pars |>
 
 #
 
-
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Calculate suitable probability at both center and range limit (cold + hot)
 # So I can compute the difference (reduce, 0, or increase?) in suitable prob
 # between center vs border
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sp_dt <- tibble()
-for(Sp in unique(sim_pars$species_id))
-{
+  sp_dt <- tibble()
+  for(Sp in unique(sim_pars$species_id))
+  {
 
-  # get which db_origin is more abundant
-  db_sim_cold = readRDS(paste0('simulations/model_lambdaPlot/out_species/', Sp, '_cold_', 2, '_', 1, '.RDS'))
-  db_sim_hot = readRDS(paste0('simulations/model_lambdaPlot/out_species/', Sp, '_hot_', 2, '_', 1, '.RDS'))
+    # get which db_origin is more abundant
+    db_sim_cold = readRDS(paste0('simulations/model_lambdaPlot/out_species/', Sp, '_cold_', 2, '_', 1, '.RDS'))
+    db_sim_hot = readRDS(paste0('simulations/model_lambdaPlot/out_species/', Sp, '_hot_', 2, '_', 1, '.RDS'))
 
-  # get range max 
-  db_sim_cold |>
-    pull(bio_01_mean) |>
-    range(na.rm = TRUE) ->
-  temp_range_cold
-  db_sim_hot |>
-    pull(bio_01_mean) |>
-    range(na.rm = TRUE) ->
-  temp_range_hot
+    # get range max 
+    db_sim_cold |>
+      pull(bio_01_mean) |>
+      range(na.rm = TRUE) ->
+    temp_range_cold
+    db_sim_hot |>
+      pull(bio_01_mean) |>
+      range(na.rm = TRUE) ->
+    temp_range_hot
 
-  # get species range from db
-  treeData |>
-    filter(species_id == Sp) |>
-    pull(bio_01_mean) |>
-    range(na.rm = TRUE) ->
-  species_range
-  
-  out_pars |>
-    filter(species_id == Sp & border == 'cold' & sim == 2 & cond != 3) |>
-    select(iter, par, value, cond) |>
-    pivot_wider(names_from = par, values_from = value) |>
-    group_by(cond, iter) |>
-    expand_grid(
-      temp = c(species_range[1], temp_range_cold[2])
-    ) |>
-    mutate(
-      mean_y = beta_mean * temp + inter,
-      sd_y = exp(sigma_inter + beta_sigma * temp)
-    ) |>
-    rowwise() |>
-    mutate(
-      ext = get_ext(mean_y, sd_y, alpha)
-    ) |>
-    mutate(
-      range_pos = if_else(temp == species_range[1], 'border', 'center')
-    ) |>
-    bind_cols(
-      border = 'Cold'
-    ) ->
-  db_cold
+    # get species range from db
+    treeData |>
+      filter(species_id == Sp) |>
+      pull(bio_01_mean) |>
+      range(na.rm = TRUE) ->
+    species_range
+    
+    out_pars |>
+      filter(species_id == Sp & border == 'cold' & sim == 2 & cond != 3) |>
+      select(iter, par, value, cond) |>
+      pivot_wider(names_from = par, values_from = value) |>
+      group_by(cond, iter) |>
+      expand_grid(
+        temp = c(species_range[1], temp_range_cold[2])
+      ) |>
+      mutate(
+        mean_y = beta_mean * temp + inter,
+        sd_y = exp(sigma_inter + beta_sigma * temp)
+      ) |>
+      rowwise() |>
+      mutate(
+        ext = get_ext(mean_y, sd_y, alpha)
+      ) |>
+      mutate(
+        range_pos = if_else(temp == species_range[1], 'border', 'center')
+      ) |>
+      bind_cols(
+        border = 'Cold'
+      ) ->
+    db_cold
 
-  out_pars |>
-    filter(species_id == Sp & border == 'hot' & sim == 2 & cond != 3) |>
-    select(iter, par, value, cond) |>
-    pivot_wider(names_from = par, values_from = value) |>
-    group_by(cond, iter) |>
-    expand_grid(
-      temp = c(temp_range_hot[1], species_range[2])
-    ) |>
-    mutate(
-      mean_y = beta_mean * temp + inter,
-      sd_y = exp(sigma_inter + beta_sigma * temp)
-    ) |>
-    rowwise() |>
-    mutate(
-      ext = get_ext(mean_y, sd_y, alpha)
-    ) |>
-    mutate(
-      range_pos = if_else(temp == species_range[2], 'border', 'center')
-    ) |>
-    bind_cols(
-      border = 'Hot'
-    ) ->
-  db_hot
+    out_pars |>
+      filter(species_id == Sp & border == 'hot' & sim == 2 & cond != 3) |>
+      select(iter, par, value, cond) |>
+      pivot_wider(names_from = par, values_from = value) |>
+      group_by(cond, iter) |>
+      expand_grid(
+        temp = c(temp_range_hot[1], species_range[2])
+      ) |>
+      mutate(
+        mean_y = beta_mean * temp + inter,
+        sd_y = exp(sigma_inter + beta_sigma * temp)
+      ) |>
+      rowwise() |>
+      mutate(
+        ext = get_ext(mean_y, sd_y, alpha)
+      ) |>
+      mutate(
+        range_pos = if_else(temp == species_range[2], 'border', 'center')
+      ) |>
+      bind_cols(
+        border = 'Hot'
+      ) ->
+    db_hot
 
-  sp_dt <- rbind(
-    sp_dt,
-    db_cold |>
-      bind_rows(db_hot) |>
-      bind_cols(species_id = Sp)
-  )
-}
+    sp_dt <- rbind(
+      sp_dt,
+      db_cold |>
+        bind_rows(db_hot) |>
+        bind_cols(species_id = Sp)
+    )
+  }
 
-saveRDS(sp_dt, file.path(sim_path, 'suitable_prob.RDS'))
+  saveRDS(sp_dt, file.path(sim_path, 'suitable_prob.RDS'))
+#
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Figures for suitable probability at the border and center of
+# hot and cold range positions
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+sp_dt <- readRDS(file.path(sim_path, 'suitable_prob.RDS'))
 
 sp_dt |>
   mutate(
@@ -809,7 +818,7 @@ sp_dt |>
 
 
 sp_dt |>
-  filter(range_pos == 'border') |>
+  filter(range_pos == 'center') |>
   select(species_id, temp, iter, cond, range_pos, border, ext) |>
   pivot_wider(
     names_from = cond,
