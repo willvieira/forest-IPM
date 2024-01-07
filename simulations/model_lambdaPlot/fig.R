@@ -714,222 +714,499 @@ out_pars |>
   saveRDS(sp_dt, file.path(sim_path, 'suitable_prob.RDS'))
 #
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Calculate the average population growth rate at both center and border
+# for the cold and hot ranges
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  get_mean <- function(mean_y, var_y, alpha) {
+    return(mean(sn::rsn(1000, mean_y, var_y, alpha)))
+  }
+
+  lambda_dt <- tibble()
+  for(Sp in unique(sim_pars$species_id))
+  {
+
+    # get which db_origin is more abundant
+    db_sim_cold = readRDS(paste0('simulations/model_lambdaPlot/out_species/', Sp, '_cold_', 2, '_', 1, '.RDS'))
+    db_sim_hot = readRDS(paste0('simulations/model_lambdaPlot/out_species/', Sp, '_hot_', 2, '_', 1, '.RDS'))
+
+    # get range max 
+    db_sim_cold |>
+      pull(bio_01_mean) |>
+      range(na.rm = TRUE) ->
+    temp_range_cold
+    db_sim_hot |>
+      pull(bio_01_mean) |>
+      range(na.rm = TRUE) ->
+    temp_range_hot
+
+    # get species range from db
+    treeData |>
+      filter(species_id == Sp) |>
+      pull(bio_01_mean) |>
+      range(na.rm = TRUE) ->
+    species_range
+    
+    out_pars |>
+      filter(species_id == Sp & border == 'cold' & sim == 2 & cond != 3) |>
+      select(iter, par, value, cond) |>
+      pivot_wider(names_from = par, values_from = value) |>
+      group_by(cond, iter) |>
+      expand_grid(
+        temp = c(species_range[1], temp_range_cold[2])
+      ) |>
+      mutate(
+        mean_y = beta_mean * temp + inter,
+        sd_y = exp(sigma_inter + beta_sigma * temp)
+      ) |>
+      rowwise() |>
+      mutate(
+        mean_lambda = get_mean(mean_y, sd_y, alpha)
+      ) |>
+      mutate(
+        range_pos = if_else(temp == species_range[1], 'border', 'center')
+      ) |>
+      bind_cols(
+        border = 'Cold'
+      ) ->
+    db_cold
+
+    out_pars |>
+      filter(species_id == Sp & border == 'hot' & sim == 2 & cond != 3) |>
+      select(iter, par, value, cond) |>
+      pivot_wider(names_from = par, values_from = value) |>
+      group_by(cond, iter) |>
+      expand_grid(
+        temp = c(temp_range_hot[1], species_range[2])
+      ) |>
+      mutate(
+        mean_y = beta_mean * temp + inter,
+        sd_y = exp(sigma_inter + beta_sigma * temp)
+      ) |>
+      rowwise() |>
+      mutate(
+        mean_lambda = get_mean(mean_y, sd_y, alpha)
+      ) |>
+      mutate(
+        range_pos = if_else(temp == species_range[2], 'border', 'center')
+      ) |>
+      bind_cols(
+        border = 'Hot'
+      ) ->
+    db_hot
+
+    lambda_dt <- rbind(
+      lambda_dt,
+      db_cold |>
+        bind_rows(db_hot) |>
+        bind_cols(species_id = Sp)
+    )
+  }
+
+  saveRDS(lambda_dt, file.path(sim_path, 'meanLambda_prob.RDS'))
+#
+
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Figures for suitable probability at the border and center of
 # hot and cold range positions
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sp_dt <- readRDS(file.path(sim_path, 'suitable_prob.RDS'))
+  sp_dt <- readRDS(file.path(sim_path, 'suitable_prob.RDS'))
 
-sp_dt |>
-  mutate(
-    cond = case_match(
-      as.character(cond),
-      '1' ~ 'Fundamental niche',
-      '2' ~ 'Realized niche'
+  sp_dt |>
+    mutate(
+      cond = case_match(
+        as.character(cond),
+        '1' ~ 'Fundamental niche',
+        '2' ~ 'Realized niche'
+      )
+    ) |>
+    ggplot() +
+    aes(temp, ext) +
+    aes(color = range_pos, fill = range_pos) +
+    facet_grid(cond~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .9, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    ylim(0, 1.1) +
+    stat_pointinterval() +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#fc8d59', '#91bfdb')) +
+    scale_fill_manual(values = c('#fc8d59', '#91bfdb')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = 'Suitable probability',
+      color = NULL,
+      fill = NULL
     )
-  ) |>
-  ggplot() +
-  aes(temp, ext) +
-  aes(color = range_pos, fill = range_pos) +
-  facet_grid(cond~border, scales = 'free_x') +
-  geom_hdr(
-    aes(color = NULL),
-    probs = .9, alpha = .4,
-    method = 'mvnorm'
-  ) +
-  ylim(0, 1.1) +
-  stat_pointinterval() +
-  theme_classic() +
-  theme(legend.position = 'top') +
-  scale_color_manual(values = c('#fc8d59', '#91bfdb')) +
-  scale_fill_manual(values = c('#fc8d59', '#91bfdb')) +
-  labs(
-    x = 'Mean annual temperature (°C)',
-    y = 'Suitable probability',
-    color = NULL,
-    fill = NULL
-  )
 
-sp_dt |>
-  filter(range_pos == 'border') |>
-  mutate(
-    cond = case_match(
-      as.character(cond),
-      '1' ~ 'Fundamental niche',
-      '2' ~ 'Realized niche'
+  sp_dt |>
+    filter(range_pos == 'border') |>
+    mutate(
+      cond = case_match(
+        as.character(cond),
+        '1' ~ 'Fundamental niche',
+        '2' ~ 'Realized niche'
+      )
+    ) |>
+    ggplot() +
+    aes(temp, ext) +
+    aes(color = cond, fill = cond) +
+    facet_wrap(~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .9, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    ylim(0, 1.1) +
+    stat_pointinterval() +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#5ab4ac', '#d8b365')) +
+    scale_fill_manual(values = c('#5ab4ac', '#d8b365')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = 'Suitable probability',
+      color = NULL,
+      fill = NULL
     )
-  ) |>
-  ggplot() +
-  aes(temp, ext) +
-  aes(color = cond, fill = cond) +
-  facet_wrap(~border, scales = 'free_x') +
-  geom_hdr(
-    aes(color = NULL),
-    probs = .9, alpha = .4,
-    method = 'mvnorm'
-  ) +
-  ylim(0, 1.1) +
-  stat_pointinterval() +
-  theme_classic() +
-  theme(legend.position = 'top') +
-  scale_color_manual(values = c('#5ab4ac', '#d8b365')) +
-  scale_fill_manual(values = c('#5ab4ac', '#d8b365')) +
-  labs(
-    x = 'Mean annual temperature (°C)',
-    y = 'Suitable probability',
-    color = NULL,
-    fill = NULL
-  )
 
-sp_dt |>
-  filter(range_pos == 'border') |>
-  select(species_id, temp, iter, cond, range_pos, border, ext) |>
-  pivot_wider(
-    names_from = cond,
-    values_from = ext,
-    names_prefix = 'cond_'
-  ) |>
-  mutate(
-    sp_diff = cond_2-cond_1
-  ) |>
-  # filter(species_id != '19462FAGGRA') |>
-  ggplot() +
-  aes(temp, sp_diff) +
-  aes(color = border, fill = border) +
-  facet_wrap(~border, scales = 'free_x') +
-  geom_hdr(
-    aes(color = NULL),
-    probs = .75, alpha = .4,
-    method = 'mvnorm'
-  ) +
-  geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
-  stat_pointinterval() +
-  theme_classic() +
-  theme(legend.position = 'top') +
-  scale_color_manual(values = c('#91bfdb', '#fc8d59')) +
-  scale_fill_manual(values = c('#91bfdb', '#fc8d59')) +
-  labs(
-    x = 'Mean annual temperature (°C)',
-    y = 'Suitable probability difference (realized - fundamental)',
-    color = NULL,
-    fill = NULL
-  )
-
-
-sp_dt |>
-  filter(range_pos == 'center') |>
-  select(species_id, temp, iter, cond, range_pos, border, ext) |>
-  pivot_wider(
-    names_from = cond,
-    values_from = ext,
-    names_prefix = 'cond_'
-  ) |>
-  mutate(
-    sp_diff = cond_2-cond_1
-  ) |>
-  # filter(species_id != '19462FAGGRA') |>
-  ggplot() +
-  aes(temp, sp_diff) +
-  aes(color = border, fill = border) +
-  facet_wrap(~border, scales = 'free_x') +
-  geom_hdr(
-    aes(color = NULL),
-    probs = .75, alpha = .4,
-    method = 'mvnorm'
-  ) +
-  geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
-  stat_pointinterval() +
-  theme_classic() +
-  theme(legend.position = 'top') +
-  scale_color_manual(values = c('#91bfdb', '#fc8d59')) +
-  scale_fill_manual(values = c('#91bfdb', '#fc8d59')) +
-  labs(
-    x = 'Mean annual temperature (°C)',
-    y = 'Suitable probability difference (realized - fundamental)',
-    color = NULL,
-    fill = NULL
-  )
-
-
-sp_dt |>
-  select(species_id, iter, cond, range_pos, border, ext) |>
-  pivot_wider(
-    names_from = cond,
-    values_from = ext,
-    names_prefix = 'cond_'
-  ) |>
-  mutate(
-    sp_diff = cond_2-cond_1
-  ) |>
-  group_by(species_id, range_pos, border) |>
-  reframe(
-    cond_1 = mean(cond_1),
-    cond_2 = mean(cond_2)
-  ) |>
-  ggplot() +
-  aes(cond_1, cond_2) +
-  aes(color = range_pos, fill = range_pos) +
-  facet_wrap(~border) +
-  geom_hdr(
-    aes(color = NULL),
-    probs = .75, alpha = .4,
-    method = 'mvnorm'
-  ) +
-  geom_point() +
-  geom_abline(slope = 1, intercept = 0, alpha = 0.7) +
-  scale_color_manual(values = c('#fc8d59', '#91bfdb')) +
-  scale_fill_manual(values = c('#fc8d59', '#91bfdb')) +
-  theme_classic() +
-  labs(
-    x = 'Suitable probability - Fundamental niche',
-    y = 'Suitable probability - Realized niche',
-    color = NULL,
-    fill = NULL
-  ) +
-  theme(legend.position = 'top')
-
-sp_dt |>
-  select(species_id, iter, cond, range_pos, border, ext) |>
-  mutate(
-    cond = case_match(
-      as.character(cond),
-      '1' ~ 'Fundamental niche',
-      '2' ~ 'Realized niche'
+  sp_dt |>
+    filter(range_pos == 'border') |>
+    select(species_id, temp, iter, cond, range_pos, border, ext) |>
+    pivot_wider(
+      names_from = cond,
+      values_from = ext,
+      names_prefix = 'cond_'
+    ) |>
+    mutate(
+      sp_diff = cond_2-cond_1
+    ) |>
+    # filter(species_id != '19462FAGGRA') |>
+    ggplot() +
+    aes(temp, sp_diff) +
+    aes(color = border, fill = border) +
+    facet_wrap(~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    stat_pointinterval() +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#91bfdb', '#fc8d59')) +
+    scale_fill_manual(values = c('#91bfdb', '#fc8d59')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = 'Suitable probability difference (realized - fundamental)',
+      color = NULL,
+      fill = NULL
     )
-  ) |>
-  pivot_wider(
-    names_from = range_pos,
-    values_from = ext,
-    names_prefix = 'cond_'
-  ) |>
-  group_by(species_id, border, cond) |>
-  reframe(
-    cond_center = mean(cond_center),
-    cond_border = mean(cond_border)
-  ) |>
-  ggplot() +
-  aes(cond_center, cond_border) +
-  aes(color = cond) +
-  # geom_point(size = 0.2, alpha = 0.5) +
-  aes(fill = cond) +
-  geom_hdr(
-    aes(color = NULL),
-    probs = .75, alpha = .4,
-    method = 'mvnorm'
-  ) +
-  geom_point() +
-  facet_wrap(~border) +
-  scale_color_manual(values = c('#5ab4ac', '#d8b365')) +
-  scale_fill_manual(values = c('#5ab4ac', '#d8b365')) +
-  theme_classic() +
-  geom_abline(slope = 1, intercept = 0) +
-  labs(
-    y = 'Suitable probability at border',
-    x = 'Suitable probability at center',
-    color = NULL,
-    fill = NULL
-  ) +
-  xlim(0.05, 1) +
-  ylim(0.05, 1) +
-  theme(legend.position = 'top')
+
+
+  sp_dt |>
+    filter(range_pos == 'center') |>
+    select(species_id, temp, iter, cond, range_pos, border, ext) |>
+    pivot_wider(
+      names_from = cond,
+      values_from = ext,
+      names_prefix = 'cond_'
+    ) |>
+    mutate(
+      sp_diff = cond_2-cond_1
+    ) |>
+    # filter(species_id != '19462FAGGRA') |>
+    ggplot() +
+    aes(temp, sp_diff) +
+    aes(color = border, fill = border) +
+    facet_wrap(~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    stat_pointinterval() +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#91bfdb', '#fc8d59')) +
+    scale_fill_manual(values = c('#91bfdb', '#fc8d59')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = 'Suitable probability difference (realized - fundamental)',
+      color = NULL,
+      fill = NULL
+    )
+
+
+  sp_dt |>
+    select(species_id, iter, cond, range_pos, border, ext) |>
+    pivot_wider(
+      names_from = cond,
+      values_from = ext,
+      names_prefix = 'cond_'
+    ) |>
+    mutate(
+      sp_diff = cond_2-cond_1
+    ) |>
+    group_by(species_id, range_pos, border) |>
+    reframe(
+      cond_1 = mean(cond_1),
+      cond_2 = mean(cond_2)
+    ) |>
+    ggplot() +
+    aes(cond_1, cond_2) +
+    aes(color = range_pos, fill = range_pos) +
+    facet_wrap(~border) +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, alpha = 0.7) +
+    scale_color_manual(values = c('#fc8d59', '#91bfdb')) +
+    scale_fill_manual(values = c('#fc8d59', '#91bfdb')) +
+    theme_classic() +
+    labs(
+      x = 'Suitable probability - Fundamental niche',
+      y = 'Suitable probability - Realized niche',
+      color = NULL,
+      fill = NULL
+    ) +
+    theme(legend.position = 'top')
+
+  sp_dt |>
+    select(species_id, iter, cond, range_pos, border, ext) |>
+    mutate(
+      cond = case_match(
+        as.character(cond),
+        '1' ~ 'Fundamental niche',
+        '2' ~ 'Realized niche'
+      )
+    ) |>
+    pivot_wider(
+      names_from = range_pos,
+      values_from = ext,
+      names_prefix = 'cond_'
+    ) |>
+    group_by(species_id, border, cond) |>
+    reframe(
+      cond_center = mean(cond_center),
+      cond_border = mean(cond_border)
+    ) |>
+    ggplot() +
+    aes(cond_center, cond_border) +
+    aes(color = cond) +
+    # geom_point(size = 0.2, alpha = 0.5) +
+    aes(fill = cond) +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_point() +
+    facet_wrap(~border) +
+    scale_color_manual(values = c('#5ab4ac', '#d8b365')) +
+    scale_fill_manual(values = c('#5ab4ac', '#d8b365')) +
+    theme_classic() +
+    geom_abline(slope = 1, intercept = 0) +
+    labs(
+      y = 'Suitable probability at border',
+      x = 'Suitable probability at center',
+      color = NULL,
+      fill = NULL
+    ) +
+    xlim(0.05, 1) +
+    ylim(0.05, 1) +
+    theme(legend.position = 'top')
+
+#
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Figures for mean lambda at the border and center of
+# hot and cold range positions
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  lambda_dt <- readRDS(file.path(sim_path, 'meanLambda_prob.RDS'))
+
+  lambda_dt |>
+    mutate(
+      cond = case_match(
+        as.character(cond),
+        '1' ~ 'Fundamental niche',
+        '2' ~ 'Realized niche'
+      )
+    ) |>
+    ggplot() +
+    aes(temp, mean_lambda) +
+    aes(color = range_pos, fill = range_pos) +
+    facet_grid(cond~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .9, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    stat_pointinterval() +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#fc8d59', '#91bfdb')) +
+    scale_fill_manual(values = c('#fc8d59', '#91bfdb')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = expression('ln('~lambda~')'),
+      color = NULL,
+      fill = NULL
+    )
+
+  lambda_dt |>
+    filter(range_pos == 'border') |>
+    mutate(
+      cond = case_match(
+        as.character(cond),
+        '1' ~ 'Fundamental niche',
+        '2' ~ 'Realized niche'
+      )
+    ) |>
+    ggplot() +
+    aes(temp, mean_lambda) +
+    aes(color = cond, fill = cond) +
+    facet_wrap(~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .9, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    stat_pointinterval() +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#5ab4ac', '#d8b365')) +
+    scale_fill_manual(values = c('#5ab4ac', '#d8b365')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = expression('ln('~lambda~')'),
+      color = NULL,
+      fill = NULL
+    )
+
+  lambda_dt |>
+    filter(range_pos == 'border') |>
+    select(species_id, temp, iter, cond, range_pos, border, mean_lambda) |>
+    pivot_wider(
+      names_from = cond,
+      values_from = mean_lambda,
+      names_prefix = 'cond_'
+    ) |>
+    mutate(
+      sp_diff = cond_2-cond_1
+    ) |>
+    ggplot() +
+    aes(temp, sp_diff) +
+    aes(color = border, fill = border) +
+    facet_wrap(~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    stat_pointinterval() +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#91bfdb', '#fc8d59')) +
+    scale_fill_manual(values = c('#91bfdb', '#fc8d59')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = expression('ln('~lambda~') difference'),
+      color = NULL,
+      fill = NULL
+    )
+
+
+  lambda_dt |>
+    filter(range_pos == 'center') |>
+    select(species_id, temp, iter, cond, range_pos, border, mean_lambda) |>
+    pivot_wider(
+      names_from = cond,
+      values_from = mean_lambda,
+      names_prefix = 'cond_'
+    ) |>
+    mutate(
+      sp_diff = cond_2-cond_1
+    ) |>
+    # filter(species_id != '19462FAGGRA') |>
+    ggplot() +
+    aes(temp, sp_diff) +
+    aes(color = border, fill = border) +
+    facet_wrap(~border, scales = 'free_x') +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    stat_pointinterval() +
+    theme_classic() +
+    theme(legend.position = 'top') +
+    scale_color_manual(values = c('#91bfdb', '#fc8d59')) +
+    scale_fill_manual(values = c('#91bfdb', '#fc8d59')) +
+    labs(
+      x = 'Mean annual temperature (°C)',
+      y = expression('ln('~lambda~') difference'),
+      color = NULL,
+      fill = NULL
+    )
+
+
+  lambda_dt |>
+    select(species_id, iter, cond, range_pos, border, mean_lambda) |>
+    pivot_wider(
+      names_from = cond,
+      values_from = mean_lambda,
+      names_prefix = 'cond_'
+    ) |>
+    mutate(
+      sp_diff = cond_2-cond_1
+    ) |>
+    group_by(species_id, range_pos, border) |>
+    reframe(
+      cond_1 = mean(cond_1),
+      cond_2 = mean(cond_2)
+    ) |>
+    ggplot() +
+    aes(cond_1, cond_2) +
+    aes(color = range_pos, fill = range_pos) +
+    facet_wrap(~border) +
+    geom_hdr(
+      aes(color = NULL),
+      probs = .75, alpha = .4,
+      method = 'mvnorm'
+    ) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, alpha = 0.7) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.7) +
+    geom_vline(xintercept = 0, linetype = 2, alpha = 0.7) +
+    scale_color_manual(values = c('#fc8d59', '#91bfdb')) +
+    scale_fill_manual(values = c('#fc8d59', '#91bfdb')) +
+    theme_classic() +
+    labs(
+      x = expression('ln('~lambda~') - fundamental niche'),
+      y = expression('ln('~lambda~') - realized niche'),
+      color = NULL,
+      fill = NULL
+    ) +
+    theme(legend.position = 'top')
+
+#
