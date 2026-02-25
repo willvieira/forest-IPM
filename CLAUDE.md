@@ -8,12 +8,6 @@ This is a R package containing a Bayesian hierarchical Integral Projection Model
 
 ## Environment Setup
 
-This project uses `renv` for reproducible R environments. The `.Rprofile` automatically activates it on startup. To restore all dependencies:
-
-```r
-renv::restore()
-```
-
 External data path is stored in `_data.path` (a plain text file pointing to the data directory on the local machine).
 
 ## Architecture
