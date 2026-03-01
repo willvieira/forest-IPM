@@ -5,11 +5,11 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Any researcher can run a full IPM for any supported species at any location by installing the package — no local data setup, no manual sourcing, no cluster required.
-**Current focus:** Phase 1 - Package Skeleton and Bug Fixes
+**Current focus:** Phase 1 - API Design
 
 ## Current Position
 
-Phase: 1 of 3 (Package Skeleton and Bug Fixes)
+Phase: 1 of 4 (API Design)
 Plan: 0 of TBD in current phase
 Status: Ready to plan
 Last activity: 2026-02-25 — Roadmap created
@@ -36,6 +36,10 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 1 (API Design) inserted before all existing phases: existing phases renumbered 1→2, 2→3, 3→4
 
 ### Decisions
 
