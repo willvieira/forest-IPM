@@ -7,6 +7,14 @@
 
 Requirements for initial release. Covers: installable package + code cleanup + cloud parameter access.
 
+### API Design
+
+- [ ] **API-01**: All exported functions listed with finalized signatures, argument names, and return types
+- [ ] **API-02**: `supported_species()` — returns data frame of available species IDs, names, and model variants
+- [ ] **API-03**: `run_ipm(species_id, lat, lon, climate, n_draws = 1, ...)` — single entry point wrapping get_params → init_pop → mkKernel → project; signature finalized before implementation
+- [ ] **API-04**: Naming conventions documented and applied consistently across all exported functions
+- [ ] **API-05**: API design document produced capturing decisions, rationale, and interface contracts for Phase 2 implementation
+
 ### Package Infrastructure
 
 - [ ] **PKG-01**: Package installs successfully via `devtools::install_github("wvieira/forest-IPM")` on a fresh R environment
@@ -45,12 +53,6 @@ Deferred to next milestone. Depends on v1 remote data layer being stable.
 - **CLS-02**: `ipm_kernel` S3 class with constructor `new_ipm_kernel()`, validator, and `print.ipm_kernel()` method
 - **CLS-03**: `ipm_population` S3 class with constructor `new_ipm_population()`, validator, and `print.ipm_population()` method
 
-### User-Facing Workflow API
-
-- **API-01**: `run_ipm(species_id, lat, lon, climate, n_draws = 1, ...)` — single entry point wrapping get_params → init_pop → mkKernel → project
-- **API-02**: `supported_species()` — returns data frame of available species IDs, names, and model variants
-- **API-03**: Input validation with informative error messages for all user-facing functions (invalid species ID, out-of-range coordinates, etc.)
-
 ### Extended Documentation
 
 - **DOC-03**: At least one vignette: "Getting started with forestIPM" — end-to-end example from species selection to lambda output
@@ -84,26 +86,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PKG-01 | Phase 1 | Pending |
-| PKG-02 | Phase 1 | Pending |
-| PKG-03 | Phase 1 | Pending |
-| PKG-04 | Phase 1 | Pending |
-| PKG-05 | Phase 1 | Pending |
-| BUG-01 | Phase 1 | Pending |
-| BUG-02 | Phase 1 | Pending |
-| BUG-03 | Phase 1 | Pending |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
-| DATA-05 | Phase 2 | Pending |
-| DATA-06 | Phase 2 | Pending |
-| DOC-01 | Phase 3 | Pending |
-| DOC-02 | Phase 3 | Pending |
+| API-01 | Phase 1 | Pending |
+| API-02 | Phase 1 | Pending |
+| API-03 | Phase 1 | Pending |
+| API-04 | Phase 1 | Pending |
+| API-05 | Phase 1 | Pending |
+| PKG-01 | Phase 2 | Pending |
+| PKG-02 | Phase 2 | Pending |
+| PKG-03 | Phase 2 | Pending |
+| PKG-04 | Phase 2 | Pending |
+| PKG-05 | Phase 2 | Pending |
+| BUG-01 | Phase 2 | Pending |
+| BUG-02 | Phase 2 | Pending |
+| BUG-03 | Phase 2 | Pending |
+| DATA-01 | Phase 3 | Pending |
+| DATA-02 | Phase 3 | Pending |
+| DATA-03 | Phase 3 | Pending |
+| DATA-04 | Phase 3 | Pending |
+| DATA-05 | Phase 3 | Pending |
+| DATA-06 | Phase 3 | Pending |
+| DOC-01 | Phase 4 | Pending |
+| DOC-02 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 16 total
-- Mapped to phases: 16
+- v1 requirements: 21 total
+- Mapped to phases: 21
 - Unmapped: 0 ✓
 
 ---
