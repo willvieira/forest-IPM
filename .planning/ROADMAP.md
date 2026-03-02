@@ -27,7 +27,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. All exported functions listed with finalized signatures and documented intent
   2. Naming conventions agreed upon and applied consistently
   3. API design document produced that guides Phase 2 implementation
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 01-01-PLAN.md — Write API_DESIGN.md: complete interface contract (all 8 exported functions, 6 S3 classes, naming conventions, validation rules)
 
 ### Phase 2: Package Skeleton and Bug Fixes
 **Goal**: Researchers can install the package from GitHub and call core functions without errors — `devtools::install_github("wvieira/forest-IPM")` succeeds, `devtools::load_all()` works, and `R CMD check` produces zero errors and zero warnings
@@ -70,7 +73,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. API Design | 0/TBD | Not started | - |
+| 1. API Design | 0/1 | Not started | - |
 | 2. Package Skeleton and Bug Fixes | 0/TBD | Not started | - |
 | 3. Remote Data Layer | 0/TBD | Not started | - |
 | 4. Documentation and Tests | 0/TBD | Not started | - |
