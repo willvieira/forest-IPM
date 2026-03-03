@@ -101,7 +101,7 @@ proj  <- project(mod, pars, stand, env, ctrl)
 
 | Column | Accepted Names | Type | Constraint |
 |--------|---------------|------|-----------|
-| Size | `size` OR `dbh` | numeric | > 0 (mm). Either column name is accepted; both in the same data.frame causes an error. |
+| Size | `size` OR `dbh` | numeric | >= 127 mm. Either column name is accepted; both in the same data.frame causes an error. |
 | Species | `sp` OR `species` OR `species_id` | character | Must match IDs in `supported_species()` (validated later by `species_model()`). |
 | Plot area | `plot_size` | numeric scalar | > 0 (m2). Must be the same value for all rows (one plot per call to `stand()`). |
 
@@ -124,7 +124,7 @@ All checks run at construction time via `cli::cli_abort()`:
 | Condition | Error message |
 |-----------|--------------|
 | No `size` or `dbh` column | `"data must contain a column named {.field size} or {.field dbh} (size in mm)."` |
-| `size` or `dbh` values <= 0 | `"All tree sizes must be positive (> 0 mm). Found {n} non-positive values."` |
+| `size` or `dbh` values < 127 | `"All tree sizes must be >= 127 mm. Found {n} values below 127 mm."` |
 | No species column (`sp`, `species`, or `species_id`) | `"data must contain a column named {.field sp}, {.field species} or {.field species_id}."` |
 | No `plot_size` column | `"data must contain a {.field plot_size} column (plot area in m2)."` |
 
@@ -133,7 +133,7 @@ All checks run at construction time via `cli::cli_abort()`:
 ```r
 # Minimal data.frame
 data <- data.frame(
-  dbh       = c(12.5, 34.0, 8.2),        # diameter at breast height in mm
+  dbh       = c(132.5, 210.0, 145.8),     # diameter at breast height in mm (must be >= 127 mm)
   species_id = c("ABIBAL", "ABIBAL", "ACERUB"),
   plot_size = 400                          # 400 m2 plot
 )
@@ -653,7 +653,7 @@ cli::cli_abort(c(
 | Condition | Message |
 |-----------|---------|
 | No `size` or `dbh` column | `"data must contain a column named {.field size} or {.field dbh} (size in mm)."` |
-| `size` or `dbh` <= 0 | `"All tree sizes must be positive (> 0 mm). Found {n} non-positive values."` |
+| `size` or `dbh` < 127 mm | `"All tree sizes must be >= 127 mm. Found {n} values below 127 mm."` |
 | No species column | `"data must contain a column named {.field sp}, {.field species} or {.field species_id}."` |
 | No `plot_size` column | `"data must contain a {.field plot_size} column (plot area in m2)."` |
 
