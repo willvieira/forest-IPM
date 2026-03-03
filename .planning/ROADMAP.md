@@ -42,11 +42,12 @@ Plans:
   3. `devtools::load_all()` compiles the Rcpp C++ eigenvalue solver without errors
   4. `mkKernel()` and `getEigenValues()` return correct results — eigenvalue computed with general (non-symmetric) solver matches base R `eigen()` output on a test kernel
   5. Calling `init_pop()` with a function argument does not depend on or inspect any global variable named `fct`
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
 - [ ] 02-01-PLAN.md — Fix three code bugs: replace SelfAdjointEigenSolver with EigenSolver (BUG-01), remove exists('fct') global check (BUG-02), replace as_vector() with unlist() (BUG-03)
-- [ ] 02-02-PLAN.md — Create package infrastructure: DESCRIPTION, NAMESPACE via roxygen2/devtools::document(), R/globals.R with all @importFrom declarations; iterate R CMD check to zero errors and warnings
+- [ ] 02-02-PLAN.md — Implement the Phase 1 API specification: 5 constructors (stand, species_model, parameters, env_condition, control), 2 engines (lambda, project), 1 utility (supported_species), all S3 classes and methods
+- [ ] 02-03-PLAN.md — Create package infrastructure: DESCRIPTION, NAMESPACE via roxygen2/devtools::document(), R/globals.R with all @importFrom declarations; iterate R CMD check to zero errors and warnings
 
 ### Phase 3: Remote Data Layer
 **Goal**: A researcher can fetch parameters for any of the 31 supported species from the cloud with a single function call — no local RDS files, no manual downloads, with results cached locally for subsequent calls
@@ -78,6 +79,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. API Design | 1/1 | Complete | 2026-03-03 |
-| 2. Package Skeleton and Bug Fixes | 0/2 | In progress | - |
+| 2. Package Skeleton and Bug Fixes | 0/3 | In progress | - |
 | 3. Remote Data Layer | 0/TBD | Not started | - |
 | 4. Documentation and Tests | 0/TBD | Not started | - |
