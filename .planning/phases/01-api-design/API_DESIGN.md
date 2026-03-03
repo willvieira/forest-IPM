@@ -174,6 +174,7 @@ Object of S3 class `"ipm_spModel"` with fields:
 | Field | Type | Description |
 |-------|------|-------------|
 | `$species` | character vector | Species IDs included in the model (after applying `on_missing` resolution). |
+| `$params` | named list | Named list for each `$species` with tibble containing the 1000 parameters draw |
 | `$on_missing` | character | The `on_missing` value used at construction. |
 
 #### Validation Rules
