@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 1 of 4 (API Design)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-25 — Roadmap created
+Plan: 1 of 1 in current phase — COMPLETE
+Status: Phase 1 complete — ready for Phase 2
+Last activity: 2026-03-03 — Plan 01-01 executed and verified
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: ~60 min
+- Total execution time: ~1 hour
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1 - API Design | 1 | ~60 min | ~60 min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 01-01 (60 min)
+- Trend: On track
 
 *Updated after each plan completion*
 
@@ -50,6 +50,12 @@ Recent decisions affecting current work:
 - [Setup]: Tiered access: Parquet + ML decoder — full fidelity for known plots, extrapolation for new locations (ML decoder deferred to v3)
 - [Setup]: Keep RcppEigen for eigenvalue solver — already implemented; C++ speedup critical for iterative projection
 - [Setup]: Cloud hosting platform TBD — needs HTTP range request support (AWS S3 confirmed; Zenodo/HuggingFace need curl verification)
+- [01-01]: Five constructors + two engines replaces run_ipm() — fulfills API-03 with composable design
+- [01-01]: Single ipm_spModel class for both single and multi-species — avoids API branching
+- [01-01]: env_condition() singular is canonical — env_conditions() plural is never used
+- [01-01]: plot_size is a column in stand() data argument, not a separate argument
+- [01-01]: store_every in control() enables memory management for long (>200 year) runs
+- [01-01]: stand() size constraint is >= 127 mm (minimum DBH threshold for inventory data)
 
 ### Pending Todos
 
@@ -62,6 +68,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Roadmap created, files written. Phase 1 ready to plan.
+Last session: 2026-03-03
+Stopped at: Phase 1 plan 01-01 complete. API_DESIGN.md written, verified, and committed. Phase 2 ready to plan.
 Resume file: None

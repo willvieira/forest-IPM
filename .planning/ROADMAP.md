@@ -12,7 +12,7 @@ Convert a working simulation codebase into a distributable R package that any re
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: API Design** - Define the public API surface of the package before implementation
+- [x] **Phase 1: API Design** - Define the public API surface of the package before implementation
 - [ ] **Phase 2: Package Skeleton and Bug Fixes** - Installable R package with zero `R CMD check` errors and all known code defects resolved
 - [ ] **Phase 3: Remote Data Layer** - Cloud Parquet parameter access via Arrow with local cache — the core value proposition
 - [ ] **Phase 4: Documentation and Tests** - roxygen2 docs on all exported functions and a testthat suite that passes on CI without network access
@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 01-01-PLAN.md — Write API_DESIGN.md: complete interface contract (all 8 exported functions, 6 S3 classes, naming conventions, validation rules)
+- [x] 01-01-PLAN.md — Write API_DESIGN.md: complete interface contract (all 8 exported functions, 6 S3 classes, naming conventions, validation rules)
 
 ### Phase 2: Package Skeleton and Bug Fixes
 **Goal**: Researchers can install the package from GitHub and call core functions without errors — `devtools::install_github("wvieira/forest-IPM")` succeeds, `devtools::load_all()` works, and `R CMD check` produces zero errors and zero warnings
@@ -73,7 +73,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. API Design | 0/1 | Not started | - |
+| 1. API Design | 1/1 | Complete | 2026-03-03 |
 | 2. Package Skeleton and Bug Fixes | 0/TBD | Not started | - |
 | 3. Remote Data Layer | 0/TBD | Not started | - |
 | 4. Documentation and Tests | 0/TBD | Not started | - |

@@ -9,11 +9,11 @@ Requirements for initial release. Covers: installable package + code cleanup + c
 
 ### API Design
 
-- [ ] **API-01**: All exported functions listed with finalized signatures, argument names, and return types
-- [ ] **API-02**: `supported_species()` — returns data frame of available species IDs, names, and model variants
-- [ ] **API-03**: `run_ipm(species_id, lat, lon, climate, n_draws = 1, ...)` — single entry point wrapping get_params → init_pop → mkKernel → project; signature finalized before implementation
-- [ ] **API-04**: Naming conventions documented and applied consistently across all exported functions
-- [ ] **API-05**: API design document produced capturing decisions, rationale, and interface contracts for Phase 2 implementation
+- [x] **API-01**: All exported functions listed with finalized signatures, argument names, and return types
+- [x] **API-02**: `supported_species()` — returns data frame of available species IDs, names, and model variants
+- [x] **API-03**: `run_ipm(species_id, lat, lon, climate, n_draws = 1, ...)` — superseded by five-constructor + two-engine pattern; canonical workflow documented in API_DESIGN.md Section 2
+- [x] **API-04**: Naming conventions documented and applied consistently across all exported functions
+- [x] **API-05**: API design document produced capturing decisions, rationale, and interface contracts for Phase 2 implementation
 
 ### Package Infrastructure
 
@@ -86,11 +86,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Phase 1 | Pending |
-| API-02 | Phase 1 | Pending |
-| API-03 | Phase 1 | Pending |
-| API-04 | Phase 1 | Pending |
-| API-05 | Phase 1 | Pending |
+| API-01 | Phase 1 | Complete (2026-03-03) |
+| API-02 | Phase 1 | Complete (2026-03-03) |
+| API-03 | Phase 1 | Complete (2026-03-03) |
+| API-04 | Phase 1 | Complete (2026-03-03) |
+| API-05 | Phase 1 | Complete (2026-03-03) |
 | PKG-01 | Phase 2 | Pending |
 | PKG-02 | Phase 2 | Pending |
 | PKG-03 | Phase 2 | Pending |
@@ -115,4 +115,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 after roadmap creation*
+*Last updated: 2026-03-03 after Phase 1 plan 01-01 completion*
