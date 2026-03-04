@@ -37,9 +37,9 @@ getPars_sp <- function(
     pars_dir |>
       map(
         ~ readRDS(.x) |>
-          filter(par != 'lp__') |>
-          group_by(par) |>
-          reframe(value = mean(value)) |>
+          filter(.data$par != 'lp__') |>
+          group_by(.data$par) |>
+          reframe(value = mean(.data$value)) |>
           pivot_wider(names_from = 'par') |>
           unlist(use.names = TRUE)
       )
@@ -47,9 +47,9 @@ getPars_sp <- function(
     pars_dir |>
       map(
         ~ readRDS(.x) |>
-          filter(par != 'lp__') |>
-          filter(iter == sample(1:4000, 1)) |>
-          select(!iter) |>
+          filter(.data$par != 'lp__') |>
+          filter(.data$iter == sample(1:4000, 1)) |>
+          select(!.data$iter) |>
           pivot_wider(names_from = 'par') |>
           unlist(use.names = TRUE)
       )
@@ -66,23 +66,23 @@ pars_to_list <- function(pars)
     select(contains('.')) |>
     pivot_longer(cols = everything()) |>
     mutate(
-      vr = str_replace(name, '\\..*', ''),
-      par = str_replace(name, paste0(vr, '.'), ''),
+      vr = str_replace(.data$name, '\\..*', ''),
+      par = str_replace(.data$name, paste0(.data$vr, '.'), ''),
       # some code uses 'recruit' instead of 'rec'
       vr = case_match(
-        vr,
+        .data$vr,
         'recruit' ~ 'rec',
-        .default = vr
+        .default = .data$vr
       )
     ) |>
-    select(!name) |>
-    group_split(vr) %>%
+    select(!.data$name) |>
+    group_split(.data$vr) %>%
     # fuck tidyverse for not wanting to implement an argument to keep a named list
     set_names(map_chr(., ~.x$vr[1])) |>
     map(
       ~.x |>
-        select(!vr) |>
-        pivot_wider(names_from = par) |>
+        select(!.data$vr) |>
+        pivot_wider(names_from = 'par') |>
         unlist(use.names = TRUE)
     )
 }
