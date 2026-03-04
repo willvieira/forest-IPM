@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 02 plan 02-01 complete. Three source bugs fixed: EigenSolver, init_pop fct scope, purrr as_vector. Ready for plan 02-02."
-last_updated: "2026-03-04T15:15:17.357Z"
-last_activity: 2026-03-04 — Plan 02-01 executed and verified
+stopped_at: "Phase 02 plan 02-02 complete. Eight API functions implemented: 5 constructors, 2 engines, 1 utility. Ready for plan 02-03 (DESCRIPTION/NAMESPACE)."
+last_updated: "2026-03-04T15:25:11Z"
+last_activity: 2026-03-04 — Plan 02-02 executed and verified
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 62
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 2 of 4 (Package Skeleton and Bug Fixes)
-Plan: 1 of 3 in current phase — COMPLETE
-Status: Phase 2 in progress — plan 02-01 complete, ready for 02-02
-Last activity: 2026-03-04 — Plan 02-01 executed and verified
+Plan: 2 of 3 in current phase — COMPLETE
+Status: Phase 2 in progress — plan 02-02 complete, ready for 02-03
+Last activity: 2026-03-04 — Plan 02-02 executed and verified
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
@@ -50,7 +50,7 @@ Progress: [█████░░░░░] 50%
 - Trend: On track
 
 *Updated after each plan completion*
-| 2 - Package Skeleton and Bug Fixes | 1 | 3 min | 3 min |
+| 2 - Package Skeleton and Bug Fixes | 2 | 8 min | 4 min |
 
 ## Accumulated Context
 
@@ -76,6 +76,10 @@ Recent decisions affecting current work:
 - [Phase 02-01]: Use Eigen::EigenSolver with computeEigenvectors=false; return .real() for VectorXd — IPM kernels are non-negative so dominant eigenvalue is real by Perron-Frobenius
 - [Phase 02-01]: Initialize fct <- 1 before while-loop in init_pop() instead of exists() check — mathematically equivalent and correct for local scope
 - [Phase 02-01]: Replace purrr::as_vector() with unlist(use.names=TRUE) — preserves named vector contracts for downstream parameter indexing
+- [Phase 02-02]: Species IDs use short form (ABIBAL) in API — numeric-prefix form (18032ABIBAL) in raw data to be resolved in Phase 3
+- [Phase 02-02]: Single-species competition: pass same Nvec as both Nvec_intra and Nvec_inter; multi-species: aggregate onto focal mesh via stats::approx()
+- [Phase 02-02]: plot_random = c(0, 0, 0) in Phase 2 — plot-level random effects from Parquet in Phase 3
+- [Phase 02-02]: Three-layer S3 pattern: new_<class>() (no validation) -> validate_<class>() (cli_abort) -> user-facing helper
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-04T15:14:51.626Z
-Stopped at: Phase 02 plan 02-01 complete. Three source bugs fixed: EigenSolver, init_pop fct scope, purrr as_vector. Ready for plan 02-02.
+Last session: 2026-03-04T15:25:11Z
+Stopped at: Phase 02 plan 02-02 complete. Eight API functions implemented: 5 constructors, 2 engines, 1 utility. Ready for plan 02-03 (DESCRIPTION/NAMESPACE).
 Resume file: None
