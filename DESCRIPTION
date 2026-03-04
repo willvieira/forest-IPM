@@ -3,27 +3,28 @@ Type: Package
 Title: Bayesian Hierarchical Integral Projection Model for Tree Population Dynamics
 Version: 0.1.0
 Authors@R:
-    person("Will", "Vieira", email = "will.vieira@example.com",
-           role = c("aut", "cre"))
-Description: A Bayesian hierarchical Integral Projection Model (IPM) for
-    studying tree population dynamics (population growth rates, coexistence,
-    sensitivity) in eastern North America.
+    person("Willian", "Vieira", , "willian.vieira@usherbrooke.ca", role = c("aut", "cre"))
+Description: Integral Projection Model for studying tree population dynamics
+    (population growth rates, coexistence, sensitivity) in eastern North America.
+    Uses Bayesian hierarchical vital rate models parameterized from forest inventory data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.1.0)
 Imports:
-    cli,
-    stats,
-    tibble,
-    utils,
-    stringdist
-Suggests:
-    devtools,
-    purrr,
-    dplyr,
-    tidyr,
-    stringr
+    Rcpp (>= 1.0.12),
+    cli (>= 3.6.2),
+    dplyr (>= 1.1.4),
+    tidyr (>= 1.3.1),
+    purrr (>= 1.1.2),
+    stringr (>= 1.5.1),
+    stringdist (>= 0.9.12),
+    rlang (>= 1.1.4),
+    magrittr (>= 2.0.3),
+    tibble (>= 3.2.1),
+    truncnorm (>= 1.0-9)
 LinkingTo:
     Rcpp,
     RcppEigen
