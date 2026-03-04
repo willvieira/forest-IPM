@@ -179,6 +179,7 @@ init_pop <- function(
     # the expected N argument
     diff_N <- N - sum(dbh_den)
 
+    fct <- 1
     Min = 0; Max = N * 5
     while(abs(diff_N) > accuracy) {
       fct = runif(1, Min, Max)
@@ -191,12 +192,7 @@ init_pop <- function(
       }
     }
 
-    # In case the generated size dist is already close to the expected N
-    if(exists('fct')) {
-      N_out <- dbh_den * fct
-    }else{
-      N_out <- dbh_den
-    }
+    N_out <- dbh_den * fct
   }
 
   return(
