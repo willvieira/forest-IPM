@@ -1,0 +1,11 @@
+^simulations$
+^_data\.path$
+^CLAUDE\.md$
+^\# TODO\.md$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.github$
+^README\.Rmd$
+\.planning$
+^\.history$
+^\.claude$

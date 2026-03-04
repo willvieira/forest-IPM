@@ -15,6 +15,15 @@ size_to_BAind <- function(
 	return( indBA_vec )
 }
 
+#' Compute Plot-Level Basal Area from Size Distribution
+#'
+#' Converts an individual size distribution vector into plot-level basal area
+#' (m2/ha).
+#'
+#' @param N List. Size distribution object; output of \code{init_pop()}.
+#' @param plot_size Numeric. Plot area in square meters.
+#'
+#' @return Numeric scalar. Total basal area in m2/ha.
 #' @export
 size_to_BAplot <- function(
 	N,
@@ -26,10 +35,10 @@ size_to_BAplot <- function(
 }
 
 
-#' Function to compute BA competition in function of population size vectors
-#' N_intra: size distribution for focal species; output of `init_pop` function
-#' N_inter: size distribution of competition species
-#' If `N_inter` is NULL, BA_comp is from intraspecific competition. If `N_inter` is defined, then BA_comp is from interspecific competition
+# Function to compute BA competition in function of population size vectors
+# N_intra: size distribution for focal species; output of init_pop function
+# N_inter: size distribution of competition species
+# If N_inter is NULL, BA_comp is from intraspecific competition. If N_inter is defined, then BA_comp is from interspecific competition
 size_to_BAcomp <- function(
 	N_intra,
 	N_inter = NULL,
@@ -55,9 +64,16 @@ size_to_BAcomp <- function(
 	)
 }
 
-#' Function to convert individual size observations to size distribution respecting the meshpoints of the focal species (Kernel dimension)
-#' dbh: vector of size in mm for each individual tree
-#' N_intra: output of `init_pop` function
+#' Convert Individual Tree Sizes to a Mesh-Aligned Size Distribution
+#'
+#' Bins individual tree diameter observations into the mesh point grid defined
+#' by an \code{init_pop()} output object.
+#'
+#' @param dbh Numeric vector. Individual tree diameters in mm.
+#' @param N_intra List. Size distribution object; output of \code{init_pop()}.
+#'
+#' @return A copy of \code{N_intra} with \code{$Nvec} replaced by the count of
+#'   individuals in each mesh size class.
 #' @export
 dbh_to_sizeDist <- function(
 	dbh,

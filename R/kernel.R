@@ -73,7 +73,25 @@ ingrowth_lk <- function(
 # Kernel and functions around building the kernel
 #################################################################
 
-# Full Kernel
+#' Build the IPM Kernel
+#'
+#' Assembles the full Integral Projection Model kernel (K = P + F) for a
+#' focal species given its size distribution vectors and environmental conditions.
+#'
+#' @param Nvec_intra List. Intraspecific size distribution; output of \code{init_pop()}.
+#' @param Nvec_inter List. Interspecific size distribution; output of \code{init_pop()}.
+#' @param delta_time Numeric. Time step in years.
+#' @param plotSize Numeric. Plot area in square meters.
+#' @param Temp Numeric. Mean annual temperature (degrees Celsius).
+#' @param Prec Numeric. Mean annual precipitation (mm).
+#' @param pars Named list. Species-specific parameters with elements
+#'   \code{growth}, \code{mort}, \code{rec}, and \code{sizeIngrowth}.
+#' @param plot_random Numeric vector of length 3. Plot-level random effects
+#'   for growth (1), mortality (2), and recruitment (3).
+#'
+#' @return A named list with elements \code{K} (full kernel), \code{P} (growth
+#'   x survival kernel), and \code{F} (recruitment kernel), each a square matrix
+#'   of dimension equal to the number of mesh points.
 #' @export
 mkKernel = function(
   Nvec_intra, Nvec_inter,
@@ -123,16 +141,26 @@ mkKernel = function(
 
 
 
-# Function to generate meshpoints and a smooth initial size distribution in
-# function of expected population size N
-#' params: species specific parameters
-#' L: lower boundary of kernel
-#' h: intgration bin
-#' N: approximated population size N expected for the initial size dist
-#' accuracy: minimum accepted error difference between N and expected N
-#' meanSize: mean of lognormal distribution for size distribution
-#' sdSize: standard deviation of lognormal distribution for size distribution
-#' Both meanSize and sdSize parameters are in natural scale
+#' Generate Initial Population Size Distribution
+#'
+#' Generates mesh points and a smooth initial size distribution scaled to an
+#' expected total population size \code{N}, using a log-normal distribution.
+#'
+#' @param params Named list. Species-specific parameters; must contain
+#'   \code{params[["growth"]]["Lmax"]}.
+#' @param L Numeric. Lower boundary of the kernel (minimum size in mm).
+#' @param h Numeric. Integration bin width in mm.
+#' @param N Numeric. Approximated target total population size (number of individuals).
+#' @param accuracy Numeric. Minimum accepted absolute error between realized
+#'   and target \code{N}. Default is \code{0.001}.
+#' @param meanSize Numeric. Mean of the log-normal size distribution in natural
+#'   scale (mm). Default is \code{130}.
+#' @param sdSize Numeric. Standard deviation of the log-normal size distribution
+#'   in natural scale. Default is \code{1.8}.
+#'
+#' @return A named list with elements \code{meshpts} (numeric vector of mesh
+#'   points), \code{Nvec} (numeric vector of individual counts per mesh point),
+#'   and \code{h} (integration bin width).
 #' @export
 init_pop <- function(
   params,

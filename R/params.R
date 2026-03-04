@@ -1,8 +1,20 @@
-# function to get parameters for specific species_id
-#' sp: species_id
-#' method: either `mean` or `random`. `Mean` is the posterior mean and `random` is a single draw from the posterior mean
-#' model: name of specific demographic model. Can be either a character or a vector of size 3 with the name of the model for each of the [1] growth, [2] mort, or [3] recruitment model. Accepted values are `intcpt`, `plot`, `comp`, and `clim` that can be used in incremental form. Defaut set to the complete model: `intcpt_plot_comp_clim`.
-#' path: default is set to 'data/output_sim_processed'
+#' Get Species-Specific Posterior Parameters
+#'
+#' Load posterior parameter samples for a given species from the local RDS files.
+#'
+#' @param sp Character. Species ID (e.g. "ABIBAL").
+#' @param method Character. Either \code{"mean"} (posterior mean) or
+#'   \code{"random"} (a single random posterior draw).
+#' @param model Character of length 1 or 3. Model complexity for
+#'   growth, mortality, and recruitment respectively. Accepted values:
+#'   \code{"intcpt"}, \code{"intcpt_plot"}, \code{"intcpt_plot_comp"},
+#'   \code{"intcpt_plot_comp_clim"}. Default is the full model.
+#' @param path Character. Path to the directory containing the processed
+#'   posterior RDS files. Default is \code{file.path("data", "output_sim_processed")}.
+#'
+#' @return A named list with elements \code{growth}, \code{mort}, \code{rec},
+#'   and \code{sizeIngrowth}, each a named numeric vector of posterior parameter
+#'   values.
 #' @export
 getPars_sp <- function(
   sp,

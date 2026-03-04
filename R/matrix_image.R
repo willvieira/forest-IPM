@@ -1,3 +1,25 @@
+#' Visualize a Matrix as an Image
+#'
+#' Plots a matrix as a color image with an optional legend, contour lines,
+#' and customizable color palette.
+#'
+#' @param A Matrix. The matrix to visualize.
+#' @param x Numeric vector. x-axis values (column positions). Default is
+#'   \code{1:ncol(A)}.
+#' @param y Numeric vector. y-axis values (row positions). Default is
+#'   \code{1:nrow(A)}.
+#' @param col Character vector. Colors for the image. Default is a rainbow
+#'   palette from blue to red.
+#' @param bw Logical. If \code{TRUE}, use a greyscale palette. Default is
+#'   \code{FALSE}.
+#' @param do.contour Logical. If \code{TRUE}, add contour lines. Default is
+#'   \code{FALSE}.
+#' @param do.legend Logical. If \code{TRUE}, add a color legend. Default is
+#'   \code{TRUE}.
+#' @param ... Additional arguments passed to \code{\link[graphics]{image}}.
+#'
+#' @return Invisibly returns \code{NULL}. Called for its side effect of
+#'   producing a plot.
 #' @export
 matrix.image <- function(A,
                          x = NULL,
