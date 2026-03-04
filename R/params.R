@@ -41,7 +41,7 @@ getPars_sp <- function(
           group_by(par) |>
           reframe(value = mean(value)) |>
           pivot_wider(names_from = 'par') |>
-          as_vector()
+          unlist(use.names = TRUE)
       )
   }else if(method == 'random') {
     pars_dir |>
@@ -51,7 +51,7 @@ getPars_sp <- function(
           filter(iter == sample(1:4000, 1)) |>
           select(!iter) |>
           pivot_wider(names_from = 'par') |>
-          as_vector()      
+          unlist(use.names = TRUE)
       )
   }else{
     stop('`param_method` parameter must be either `mean` or `random`')
@@ -83,6 +83,6 @@ pars_to_list <- function(pars)
       ~.x |>
         select(!vr) |>
         pivot_wider(names_from = par) |>
-        as_vector()
+        unlist(use.names = TRUE)
     )
 }
