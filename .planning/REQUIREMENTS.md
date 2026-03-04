@@ -25,9 +25,9 @@ Requirements for initial release. Covers: installable package + code cleanup + c
 
 ### Bug Fixes
 
-- [ ] **BUG-01**: `src/eigen.cpp` eigenvalue solver fixed — `SelfAdjointEigenSolver` (assumes symmetric input) replaced with `EigenSolver` (general non-symmetric matrices), since IPM kernel K = P + F is not symmetric
-- [ ] **BUG-02**: `exists('fct')` global state check in `init_pop()` (kernel.R) removed or replaced with a proper function argument
-- [ ] **BUG-03**: Deprecated `purrr::as_vector()` calls in `params.R` replaced with `unlist()` to prevent breakage on purrr >= 1.0.0
+- [x] **BUG-01**: `src/eigen.cpp` eigenvalue solver fixed — `SelfAdjointEigenSolver` (assumes symmetric input) replaced with `EigenSolver` (general non-symmetric matrices), since IPM kernel K = P + F is not symmetric
+- [x] **BUG-02**: `exists('fct')` global state check in `init_pop()` (kernel.R) removed or replaced with a proper function argument
+- [x] **BUG-03**: Deprecated `purrr::as_vector()` calls in `params.R` replaced with `unlist()` to prevent breakage on purrr >= 1.0.0
 
 ### Remote Data Layer
 
@@ -96,9 +96,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PKG-03 | Phase 2 | Pending |
 | PKG-04 | Phase 2 | Pending |
 | PKG-05 | Phase 2 | Pending |
-| BUG-01 | Phase 2 | Pending |
-| BUG-02 | Phase 2 | Pending |
-| BUG-03 | Phase 2 | Pending |
+| BUG-01 | Phase 2 | Complete |
+| BUG-02 | Phase 2 | Complete |
+| BUG-03 | Phase 2 | Complete |
 | DATA-01 | Phase 3 | Pending |
 | DATA-02 | Phase 3 | Pending |
 | DATA-03 | Phase 3 | Pending |

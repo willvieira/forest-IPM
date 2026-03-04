@@ -2,13 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-03T03:09:44.286Z"
+status: executing
+stopped_at: "Phase 02 plan 02-01 complete. Three source bugs fixed: EigenSolver, init_pop fct scope, purrr as_vector. Ready for plan 02-02."
+last_updated: "2026-03-04T15:15:17.357Z"
+last_activity: 2026-03-04 — Plan 02-01 executed and verified
 progress:
-  total_phases: 1
+  total_phases: 4
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 4
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -18,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Any researcher can run a full IPM for any supported species at any location by installing the package — no local data setup, no manual sourcing, no cluster required.
-**Current focus:** Phase 1 - API Design
+**Current focus:** Phase 2 - Package Skeleton and Bug Fixes
 
 ## Current Position
 
-Phase: 1 of 4 (API Design)
-Plan: 1 of 1 in current phase — COMPLETE
-Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-03-03 — Plan 01-01 executed and verified
+Phase: 2 of 4 (Package Skeleton and Bug Fixes)
+Plan: 1 of 3 in current phase — COMPLETE
+Status: Phase 2 in progress — plan 02-01 complete, ready for 02-02
+Last activity: 2026-03-04 — Plan 02-01 executed and verified
 
-Progress: [██░░░░░░░░] 25%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -47,6 +50,7 @@ Progress: [██░░░░░░░░] 25%
 - Trend: On track
 
 *Updated after each plan completion*
+| 2 - Package Skeleton and Bug Fixes | 1 | 3 min | 3 min |
 
 ## Accumulated Context
 
@@ -69,6 +73,9 @@ Recent decisions affecting current work:
 - [01-01]: plot_size is a column in stand() data argument, not a separate argument
 - [01-01]: store_every in control() enables memory management for long (>200 year) runs
 - [01-01]: stand() size constraint is >= 127 mm (minimum DBH threshold for inventory data)
+- [Phase 02-01]: Use Eigen::EigenSolver with computeEigenvectors=false; return .real() for VectorXd — IPM kernels are non-negative so dominant eigenvalue is real by Perron-Frobenius
+- [Phase 02-01]: Initialize fct <- 1 before while-loop in init_pop() instead of exists() check — mathematically equivalent and correct for local scope
+- [Phase 02-01]: Replace purrr::as_vector() with unlist(use.names=TRUE) — preserves named vector contracts for downstream parameter indexing
 
 ### Pending Todos
 
@@ -78,9 +85,10 @@ None yet.
 
 - [Phase 2 readiness]: Cloud hosting platform not yet selected — must verify HTTP 206 range request support via `curl -I --range 0-100 <url>` before writing fetch code. AWS S3 is confirmed; Zenodo and HuggingFace Hub need runtime verification.
 - [Phase 2 readiness]: `httptest2` interceptability of Arrow's libcurl calls is unconfirmed — R-level HTTP mocking may not reach the C++ layer. Fallback is `skip_on_ci()` for network tests + RDS fixture testing.
+- Xcode license not accepted — C++ compilation blocked until sudo xcodebuild -license accept is run in a terminal
 
 ## Session Continuity
 
-Last session: 2026-03-03
-Stopped at: Phase 1 plan 01-01 complete. API_DESIGN.md written, verified, and committed. Phase 2 ready to plan.
+Last session: 2026-03-04T15:14:51.626Z
+Stopped at: Phase 02 plan 02-01 complete. Three source bugs fixed: EigenSolver, init_pop fct scope, purrr as_vector. Ready for plan 02-02.
 Resume file: None
