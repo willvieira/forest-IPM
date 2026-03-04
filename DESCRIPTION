@@ -1,0 +1,29 @@
+Package: forestIPM
+Type: Package
+Title: Bayesian Hierarchical Integral Projection Model for Tree Population Dynamics
+Version: 0.1.0
+Authors@R:
+    person("Will", "Vieira", email = "will.vieira@example.com",
+           role = c("aut", "cre"))
+Description: A Bayesian hierarchical Integral Projection Model (IPM) for
+    studying tree population dynamics (population growth rates, coexistence,
+    sensitivity) in eastern North America.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    cli,
+    stats,
+    tibble,
+    utils,
+    stringdist
+Suggests:
+    devtools,
+    purrr,
+    dplyr,
+    tidyr,
+    stringr
+LinkingTo:
+    Rcpp,
+    RcppEigen
