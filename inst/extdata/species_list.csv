@@ -1,34 +1,32 @@
-species_id,common_name,nom_commun,growth_model,surv_model,recruit_model
-ABIBAL,Balsam fir,Sapin baumier,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-ACERUB,Red maple,Erable rouge,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-ACESAC,Sugar maple,Erable a sucre,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-BETALL,Yellow birch,Bouleau jaune,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-BETPAP,White birch,Bouleau blanc,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-CARGLA,Pignut hickory,Caryer glabre,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-FAGGRA,American beech,Hetre a grandes feuilles,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-FRAAME,White ash,Frene blanc,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-FRANIG,Black ash,Frene noir,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-FRAPEN,Green ash,Frene rouge,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-JUNVIR,Eastern red cedar,Genevrier de Virginie,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-LIQSTY,Sweetgum,Copalme d'Amerique,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-LIRTUL,Tulip tree,Tulipier de Virginie,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-NACARALB,Mockernut hickory,Caryer tomenteux,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-NAQUEPRI,Chestnut oak,Chene chataignier,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-NYSSYL,Black gum,Nysse sylvestre,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-OSTVIR,Eastern hophornbeam,Ostryer de Virginie,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-PICGLA,White spruce,Epicea blanc,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-PICMAR,Black spruce,Epicea noir,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-PICRUB,Red spruce,Epicea rouge,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-PINBAN,Jack pine,Pin gris,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-PINSTR,Eastern white pine,Pin blanc,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-POPGRA,Bigtooth aspen,Peuplier a grandes dents,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-POPTRE,Trembling aspen,Peuplier faux-tremble,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-PRUSER,Black cherry,Cerisier tardif,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-QUEALB,White oak,Chene blanc,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-QUERUB,Northern red oak,Chene rouge,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-QUESTE,Post oak,Chene etoile,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-QUEVEL,Black oak,Chene velutineux,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-THUOCC,Eastern white cedar,Thuya occidental,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-TILAME,American basswood,Tilleul d'Amerique,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-TSUCAN,Eastern hemlock,Tsuga du Canada,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
-ULMAME,American elm,Orme d'Amerique,intcpt_plot_comp_clim,intcpt_plot_comp_clim,intcpt_plot_comp_clim
+"species_id","common_name","nom_commun","growth_model","surv_model","recruit_model"
+"ABIBAL","Balsam fir","Sapin baumier","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"ACERUB","Red maple","Erable rouge","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"ACESAC","Sugar maple","Erable a sucre","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"BETALL","Yellow birch","Bouleau jaune","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"BETPAP","White birch","Bouleau blanc","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"CARGLA","Pignut hickory","Caryer glabre","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"CARTOM","Mockernut hickory","Caryer tomenteux","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"FAGGRA","American beech","Hetre a grandes feuilles","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"FRAAME","White ash","Frene blanc","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"FRANIG","Black ash","Frene noir","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"FRAPEN","Green ash","Frene rouge","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"JUNVIR","Eastern red cedar","Genevrier de Virginie","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"LIQSTY","Sweetgum","Copalme d'Amerique","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"LIRTUL","Tulip tree","Tulipier de Virginie","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"NYSSYL","Black gum","Nysse sylvestre","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"PICGLA","White spruce","Epicea blanc","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"PICMAR","Black spruce","Epicea noir","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"PICRUB","Red spruce","Epicea rouge","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"PINBAN","Jack pine","Pin gris","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"PINSTR","Eastern white pine","Pin blanc","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"POPGRA","Bigtooth aspen","Peuplier a grandes dents","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"POPTRE","Trembling aspen","Peuplier faux-tremble","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"PRUSER","Black cherry","Cerisier tardif","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"QUEALB","White oak","Chene blanc","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"QUEPRI","Chestnut oak","Chene chataignier","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"QUERUB","Northern red oak","Chene rouge","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"QUESTE","Post oak","Chene etoile","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"QUEVEL","Black oak","Chene velutineux","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"THUOCC","Eastern white cedar","Thuya occidental","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"TILAME","American basswood","Tilleul d'Amerique","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
+"TSUCAN","Eastern hemlock","Tsuga du Canada","intcpt_plot_comp_clim","intcpt_plot_comp_clim","intcpt_plot_comp_clim"
