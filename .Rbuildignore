@@ -9,3 +9,4 @@
 \.planning$
 ^\.history$
 ^\.claude$
+^data-raw$

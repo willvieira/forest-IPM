@@ -1,74 +1,71 @@
 #' Compute the asymptotic population growth rate (lambda) per species
 #'
 #' @param mod An \code{ipm_spModel} object.
-#' @param pars An \code{ipm_parameters} object. Must contain parameters for all
-#'   species in \code{mod}.
-#' @param stand An \code{ipm_stand} object. Initial size distribution.
+#' @param pars An \code{ipm_parameters} object. Must contain parameters for at
+#'   least one species in \code{mod}. Lambda is computed only for species present
+#'   in both \code{mod} and \code{pars} — other species in \code{stand} are used
+#'   as competitors but do not appear in the output.
+#' @param stand An \code{ipm_stand} object. Provides size distributions for all
+#'   species (focal and competitors).
 #' @param env An \code{ipm_env} object. Climate drivers.
 #' @param ctrl An \code{ipm_control} object or NULL. Only \code{bin_width} and
-#'   \code{delta_time} are used; \code{years} and \code{store_every} are ignored.
-#'   If NULL, defaults are used (bin_width = 1, delta_time = 1).
+#'   \code{delta_time} are used. If NULL, defaults are used.
 #' @return An object of S3 class \code{"ipm_lambda"} — a named numeric vector
-#'   with one element per species in \code{mod}.
+#'   with one element per focal species (species with available parameters).
 #' @export
 lambda <- function(mod, pars, stand, env, ctrl = NULL) {
-  # Input validation
   if (!inherits(mod,   "ipm_spModel"))    cli::cli_abort("{.arg mod} must be {.cls ipm_spModel}.")
   if (!inherits(pars,  "ipm_parameters")) cli::cli_abort("{.arg pars} must be {.cls ipm_parameters}.")
   if (!inherits(stand, "ipm_stand"))      cli::cli_abort("{.arg stand} must be {.cls ipm_stand}.")
   if (!inherits(env,   "ipm_env"))        cli::cli_abort("{.arg env} must be {.cls ipm_env}.")
 
-  # Cross-constructor checks
-  missing_sp <- setdiff(mod$species, names(pars$species_params))
-  if (length(missing_sp) > 0) {
-    cli::cli_abort("pars does not contain parameters for all species in mod. Missing: {.val {missing_sp}}.")
-  }
-  extra_sp <- setdiff(stand$species, mod$species)
-  if (length(extra_sp) > 0) {
-    cli::cli_abort("stand contains species not in mod: {.val {extra_sp}}.")
+  # Focal species: mod species that have parameters in pars
+  focal_species <- intersect(mod$species, names(pars$species_params))
+  if (length(focal_species) == 0) {
+    cli::cli_abort(
+      "No overlap between {.arg mod} species and {.arg pars} species. \\
+      {.arg pars} must contain parameters for at least one species in {.arg mod}."
+    )
   }
 
   if (is.null(ctrl)) ctrl <- control()
   bin_w      <- ctrl$bin_width
   delta_time <- ctrl$delta_time
 
-  # Resolve static climate at t = 0
   Temp <- if (is.function(env$MAT)) env$MAT(0) else env$MAT
   Prec <- if (is.function(env$MAP)) env$MAP(0) else env$MAP
-  plot_random <- c(0, 0, 0)  # Phase 2: no plot random effects; Phase 3 will use pars$species_params[[sp]]$random_effects
 
-  # Build size distributions for all species
-  nvec_list <- lapply(stats::setNames(mod$species, mod$species), function(sp) {
+  # Build size distributions from stand data for ALL species in stand + focal species.
+  # Observed tree sizes determine the distribution; init_pop() is not used.
+  all_species <- union(stand$species, focal_species)
+
+  nvec_list <- lapply(stats::setNames(all_species, all_species), function(sp) {
+    sp_trees <- stand$trees$size_mm[stand$trees$species_id == sp]
     sp_pars  <- pars$species_params[[sp]]$fixed
-    n_trees  <- sum(stand$trees$species_id == sp)
 
-    if (is.null(sp_pars)) {
-      # Phase 2 fallback: parameters not loaded; use a minimal default
-      lmax <- 500
-      sp_pars_stub <- list(growth = c(Lmax = lmax))
-      pop <- init_pop(params = sp_pars_stub, L = 127, h = bin_w, N = max(n_trees, 1))
+    # Upper mesh bound: Lmax from params if available, else from observed sizes
+    lmax <- if (!is.null(sp_pars) && !is.null(sp_pars$growth)) {
+      round(sp_pars$growth["Lmax"], 0)
+    } else if (length(sp_trees) > 0) {
+      ceiling(max(sp_trees)) + bin_w * 5L
     } else {
-      pop <- init_pop(params = sp_pars, L = 127, h = bin_w, N = max(n_trees, 1))
+      500L
     }
 
-    # If species has actual observed trees, replace smooth init with observed distribution
-    if (n_trees > 0) {
-      sp_dbh <- stand$trees$size_mm[stand$trees$species_id == sp]
-      pop    <- dbh_to_sizeDist(dbh = sp_dbh, N_intra = pop)
-    }
-    pop
+    m   <- max(1L, as.integer(ceiling((lmax - 127) / bin_w)))
+    msh <- 127 + ((seq_len(m)) - 0.5) * bin_w
+    out <- list(meshpts = msh, Nvec = rep(0.0, m), h = bin_w)
+
+    if (length(sp_trees) > 0) out <- dbh_to_sizeDist(dbh = sp_trees, N_intra = out)
+    out
   })
 
-  # Compute competitor Nvec (sum of all other species) for background competition
+  # Aggregate competitors onto focal mesh via linear interpolation
   .make_inter <- function(focal_sp, nvec_list) {
     other_sp <- setdiff(names(nvec_list), focal_sp)
-    if (length(other_sp) == 0) {
-      return(nvec_list[[focal_sp]])  # single species: intra = inter
-    }
-    # Aggregate competitors onto focal species mesh
+    if (length(other_sp) == 0) return(nvec_list[[focal_sp]])
     focal_mesh <- nvec_list[[focal_sp]]
     inter_nvec <- rowSums(sapply(other_sp, function(sp) {
-      # Project competitor Nvec onto focal mesh via linear interpolation
       stats::approx(nvec_list[[sp]]$meshpts, nvec_list[[sp]]$Nvec,
                     xout = focal_mesh$meshpts, rule = 2)$y
     }))
@@ -76,10 +73,22 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
     focal_mesh
   }
 
-  # Compute lambda per species
-  lambdas <- vapply(mod$species, function(sp) {
+  # Compute lambda only for focal species
+  lambdas <- vapply(focal_species, function(sp) {
     sp_pars <- pars$species_params[[sp]]$fixed
-    if (is.null(sp_pars)) return(NA_real_)
+    if (is.null(sp_pars)) {
+      cli::cli_abort(
+        "Parameters for focal species {.val {sp}} are NULL. \\
+        Cannot compute lambda — ensure the RDS file for this species is present."
+      )
+    }
+
+    # Per-species plot-level random effects; default to zero offsets if not set
+    plot_random <- if(is.null(pars$species_params[[sp]]$random_effects)) {
+      c(0, 0, 0)
+    }else {
+      pars$species_params[[sp]]$random_effects
+    }
 
     Nvec_intra <- nvec_list[[sp]]
     Nvec_inter <- .make_inter(sp, nvec_list)
@@ -115,8 +124,7 @@ summary.ipm_lambda <- function(object, ...) {
   cat("<ipm_lambda> summary\n")
   cat(sprintf("  Species: %d\n", length(object)))
   for (sp in names(object)) {
-    status <- if (is.na(object[[sp]])) "NA (parameters not loaded)"
-              else if (object[[sp]] > 1) "growing (lambda > 1)"
+    status <- if (object[[sp]] > 1) "growing (lambda > 1)"
               else if (object[[sp]] < 1) "declining (lambda < 1)"
               else "stable (lambda = 1)"
     cat(sprintf("  %s: %.4f  [%s]\n", sp, object[[sp]], status))

@@ -57,14 +57,15 @@ species_model <- function(x, on_missing = "error") {
     ))
   }
 
-  # Load parameters eagerly for each species using the internal getPars_sp()
-  # In Phase 3 this will be replaced by cloud Parquet fetching.
-  # For now: attempt to load; if path does not exist, store NULL (Phase 3 will fill this).
+  # Load all posterior draws + pre-computed mean from the shipped RDS per species.
+  # Each RDS contains list(draws = list(growth, mort, rec, sizeIngrowth), mean = list(...)).
+  # parameters() selects one realization from this loaded data.
+  # Phase 3 will replace missing RDS with cloud Parquet fetch.
   params <- lapply(stats::setNames(sp_ids, sp_ids), function(sp) {
-    tryCatch(
-      getPars_sp(sp = sp, method = "random"),  # load full posterior draws
-      error = function(e) NULL  # Phase 2: local RDS may not exist yet; Phase 3 adds cloud fetch
-    )
+    rds_path <- system.file("extdata", "parameters", paste0(sp, "_pars.rds"),
+                            package = "forestIPM")
+    if (nchar(rds_path) == 0) return(NULL)  # RDS not yet shipped
+    readRDS(rds_path)
   })
 
   obj <- new_ipm_spModel(

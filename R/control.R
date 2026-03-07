@@ -1,13 +1,14 @@
 # new_ipm_control: low-level constructor
-new_ipm_control <- function(years, delta_time, store_every, bin_width) {
+new_ipm_control <- function(years, delta_time, store_every, bin_width, compute_lambda) {
   structure(
     list(years = years, delta_time = delta_time,
-         store_every = store_every, bin_width = bin_width),
+         store_every = store_every, bin_width = bin_width,
+         compute_lambda = compute_lambda),
     class = "ipm_control"
   )
 }
 
-# validate_ipm_control: checks all four arguments
+# validate_ipm_control: checks all arguments
 validate_ipm_control <- function(x) {
   is_pos_int <- function(v) is.numeric(v) && length(v) == 1 && v > 0 && v == floor(v)
   is_pos_num <- function(v) is.numeric(v) && length(v) == 1 && v > 0
@@ -32,6 +33,11 @@ validate_ipm_control <- function(x) {
       "{.arg bin_width} must be a positive integer. Got {.val {x$bin_width}}."
     )
   }
+  if (!is.logical(x$compute_lambda) || length(x$compute_lambda) != 1 || is.na(x$compute_lambda)) {
+    cli::cli_abort(
+      "{.arg compute_lambda} must be TRUE or FALSE."
+    )
+  }
   x
 }
 
@@ -41,23 +47,29 @@ validate_ipm_control <- function(x) {
 #' @param delta_time Positive numeric. Duration of each timestep in years. Default 1.
 #' @param store_every Positive integer. Store stand state every N timesteps. Default 1.
 #' @param bin_width Positive integer. Bin width for IPM kernel discretization. Default 1.
+#' @param compute_lambda Logical. Whether to compute the asymptotic lambda at each
+#'   timestep via eigendecomposition. Set to FALSE to skip (faster projections when
+#'   only population structure is needed). Default FALSE
 #' @return An object of S3 class \code{"ipm_control"}.
 #' @export
-control <- function(years = 100, delta_time = 1, store_every = 1, bin_width = 1) {
+control <- function(years = 100, delta_time = 1, store_every = 1, bin_width = 1,
+                    compute_lambda = FALSE) {
   validate_ipm_control(
     new_ipm_control(
-      years       = years,
-      delta_time  = delta_time,
-      store_every = store_every,
-      bin_width   = bin_width
+      years          = years,
+      delta_time     = delta_time,
+      store_every    = store_every,
+      bin_width      = bin_width,
+      compute_lambda = compute_lambda
     )
   )
 }
 
 #' @export
 print.ipm_control <- function(x, ...) {
-  cat(sprintf("<ipm_control>  %d years | dt=%.1f | store_every=%d | bin_width=%d\n",
-              x$years, x$delta_time, x$store_every, x$bin_width))
+  cat(sprintf("<ipm_control>  %d years | dt=%.1f | store_every=%d | bin_width=%d | lambda=%s\n",
+              x$years, x$delta_time, x$store_every, x$bin_width,
+              if (x$compute_lambda) "yes" else "no"))
   invisible(x)
 }
 
@@ -70,5 +82,6 @@ summary.ipm_control <- function(object, ...) {
   cat(sprintf("  Store every: %d timestep(s) => %d stored states\n",
               object$store_every, stored_steps))
   cat(sprintf("  Kernel bin width: %d mm\n", object$bin_width))
+  cat(sprintf("  Compute lambda: %s\n", if (object$compute_lambda) "yes" else "no"))
   invisible(object)
 }
