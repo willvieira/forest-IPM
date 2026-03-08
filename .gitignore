@@ -41,6 +41,11 @@ simulations/*/output
 *.png
 _data.path
 
-# ignore some simulations 
+# ignore some simulations
 simulations/lambda_plotv*
 simulations/par.mPop_effect
+
+# C++ compiled artifacts
+src/*.o
+src/*.so
+src/*.dll
