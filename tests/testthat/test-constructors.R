@@ -90,8 +90,7 @@ test_that("parameters() returns ipm_parameters with required structure", {
   df <- data.frame(size_mm = c(150, 200, 300), species_id = "ABIBAL", plot_size = 1000)
   s <- stand(df)
   mod <- species_model(s)
-  # Use explicit integer draw (draw_type = "user_defined") to avoid random sampling
-  p <- parameters(mod, draw = 1L)
+  p <- parameters(mod, draw = "random", seed = 42L)
   expect_s3_class(p, "ipm_parameters")
   expect_true("species_params" %in% names(p))
   expect_true("draw_type" %in% names(p))

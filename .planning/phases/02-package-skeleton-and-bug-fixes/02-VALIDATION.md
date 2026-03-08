@@ -83,10 +83,6 @@ During validation, a compilation error was discovered: `RcppExports.cpp` used `M
 - `Rcpp::compileAttributes()` regenerated `src/RcppExports.cpp` with correct qualified types
 - `devtools::load_all()` now compiles successfully: `Match: TRUE` confirmed
 
-### Parameters Draw Range Bug (Phase 2 observation)
-
-`parameters()` uses `sample(1L:2000L, 1L)` for random draw selection but `validate_ipm_parameters()` rejects draws > 1000. This causes ~50% of random `parameters()` calls to fail. Not fixed here (out of validation scope), but tracked for Phase 3.
-
 ---
 
 ## Validation Audit 2026-03-07

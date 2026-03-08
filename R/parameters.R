@@ -25,9 +25,9 @@ validate_ipm_parameters <- function(x) {
     }
   } else {
     if (!is.integer(x$draw) || length(x$draw) != 1L ||
-        is.na(x$draw) || x$draw < 1L || x$draw > 1000L) {
+        is.na(x$draw) || x$draw < 1L || x$draw > 2000L) {
       cli::cli_abort(
-        '{.field draw} must be an integer between 1 and 1000 when {.field draw_type} is {.val {x$draw_type}}.'
+        '{.field draw} must be an integer between 1 and 2000 when {.field draw_type} is {.val {x$draw_type}}.'
       )
     }
   }
