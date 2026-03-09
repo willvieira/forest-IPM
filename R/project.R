@@ -72,6 +72,14 @@ project <- function(mod, pars, stand, env, ctrl) {
   summary_rows <- list()
 
   # Projection loop
+  if (ctrl$progress) {
+    pb <- cli::cli_progress_bar(
+      name   = "Projecting",
+      total  = ctrl$years,
+      format = "{cli::pb_name} {cli::pb_bar} {cli::pb_current}/{cli::pb_total} yr | ETA: {cli::pb_eta}"
+    )
+  }
+
   for (t in seq_len(ctrl$years)) {
     Temp <- if (is.function(env$.MAT_scl)) env$.MAT_scl(t) else env$.MAT_scl
     Prec <- if (is.function(env$.MAP_scl)) env$.MAP_scl(t) else env$.MAP_scl
@@ -110,6 +118,8 @@ project <- function(mod, pars, stand, env, ctrl) {
 
     nvec_list <- .update_N_het(mod$species, new_nvec_list)
 
+    if (ctrl$progress) cli::cli_progress_update(id = pb)
+
     if (t %% ctrl$store_every == 0) {
       stored_t <- c(stored_t, t)
 
@@ -131,6 +141,8 @@ project <- function(mod, pars, stand, env, ctrl) {
       }
     }
   }
+
+  if (ctrl$progress) cli::cli_progress_done(id = pb)
 
   summary_tbl <- do.call(rbind, summary_rows)
 

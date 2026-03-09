@@ -1,9 +1,9 @@
 # new_ipm_control: low-level constructor
-new_ipm_control <- function(years, delta_time, store_every, bin_width, compute_lambda) {
+new_ipm_control <- function(years, delta_time, store_every, bin_width, compute_lambda, progress) {
   structure(
     list(years = years, delta_time = delta_time,
          store_every = store_every, bin_width = bin_width,
-         compute_lambda = compute_lambda),
+         compute_lambda = compute_lambda, progress = progress),
     class = "ipm_control"
   )
 }
@@ -38,6 +38,11 @@ validate_ipm_control <- function(x) {
       "{.arg compute_lambda} must be TRUE or FALSE."
     )
   }
+  if (!is.logical(x$progress) || length(x$progress) != 1 || is.na(x$progress)) {
+    cli::cli_abort(
+      "{.arg progress} must be TRUE or FALSE."
+    )
+  }
   x
 }
 
@@ -50,26 +55,30 @@ validate_ipm_control <- function(x) {
 #' @param compute_lambda Logical. Whether to compute the asymptotic lambda at each
 #'   timestep via eigendecomposition. Set to FALSE to skip (faster projections when
 #'   only population structure is needed). Default FALSE
+#' @param progress Logical. Whether to display a progress bar during projection.
+#'   Default TRUE.
 #' @return An object of S3 class \code{"ipm_control"}.
 #' @export
 control <- function(years = 100, delta_time = 1, store_every = 1, bin_width = 1,
-                    compute_lambda = FALSE) {
+                    compute_lambda = FALSE, progress = TRUE) {
   validate_ipm_control(
     new_ipm_control(
       years          = years,
       delta_time     = delta_time,
       store_every    = store_every,
       bin_width      = bin_width,
-      compute_lambda = compute_lambda
+      compute_lambda = compute_lambda,
+      progress       = progress
     )
   )
 }
 
 #' @export
 print.ipm_control <- function(x, ...) {
-  cat(sprintf("<ipm_control>  %d years | dt=%.1f | store_every=%d | bin_width=%d | lambda=%s\n",
+  cat(sprintf("<ipm_control>  %d years | dt=%.1f | store_every=%d | bin_width=%d | lambda=%s | progress=%s\n",
               x$years, x$delta_time, x$store_every, x$bin_width,
-              if (x$compute_lambda) "yes" else "no"))
+              if (x$compute_lambda) "yes" else "no",
+              if (x$progress) "yes" else "no"))
   invisible(x)
 }
 
@@ -83,5 +92,6 @@ summary.ipm_control <- function(object, ...) {
               object$store_every, stored_steps))
   cat(sprintf("  Kernel bin width: %d mm\n", object$bin_width))
   cat(sprintf("  Compute lambda: %s\n", if (object$compute_lambda) "yes" else "no"))
+  cat(sprintf("  Progress bar:   %s\n", if (object$progress) "yes" else "no"))
   invisible(object)
 }
