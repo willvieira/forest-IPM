@@ -7,7 +7,7 @@
 size_to_BAplot(N, plot_size)
 }
 \arguments{
-\item{N}{List. Size distribution object; output of \code{init_pop()}.}
+\item{N}{List. Size distribution object.}
 
 \item{plot_size}{Numeric. Plot area in square meters.}
 }

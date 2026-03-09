@@ -16,9 +16,9 @@ mkKernel(
 )
 }
 \arguments{
-\item{Nvec_intra}{List. Intraspecific size distribution; output of \code{init_pop()}.}
+\item{Nvec_intra}{List. Intraspecific size distribution.}
 
-\item{Nvec_inter}{List. Interspecific size distribution; output of \code{init_pop()}.}
+\item{Nvec_inter}{List. Interspecific size distribution.}
 
 \item{delta_time}{Numeric. Time step in years.}
 

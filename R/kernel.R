@@ -78,8 +78,8 @@ ingrowth_lk <- function(
 #' Assembles the full Integral Projection Model kernel (K = P + F) for a
 #' focal species given its size distribution vectors and environmental conditions.
 #'
-#' @param Nvec_intra List. Intraspecific size distribution; output of \code{init_pop()}.
-#' @param Nvec_inter List. Interspecific size distribution; output of \code{init_pop()}.
+#' @param Nvec_intra List. Intraspecific size distribution.
+#' @param Nvec_inter List. Interspecific size distribution.
 #' @param delta_time Numeric. Time step in years.
 #' @param plotSize Numeric. Plot area in square meters.
 #' @param Temp Numeric. Mean annual temperature (degrees Celsius).
@@ -92,7 +92,6 @@ ingrowth_lk <- function(
 #' @return A named list with elements \code{K} (full kernel), \code{P} (growth
 #'   x survival kernel), and \code{F} (recruitment kernel), each a square matrix
 #'   of dimension equal to the number of mesh points.
-#' @export
 mkKernel = function(
   Nvec_intra, Nvec_inter,
   delta_time, plotSize, Temp, Prec, pars,
@@ -140,94 +139,3 @@ mkKernel = function(
 }
 
 
-
-#' Generate Initial Population Size Distribution
-#'
-#' Generates mesh points and a smooth initial size distribution scaled to an
-#' expected total population size \code{N}, using a log-normal distribution.
-#'
-#' @param params Named list. Species-specific parameters; must contain
-#'   \code{params[["growth"]]["Lmax"]}.
-#' @param L Numeric. Lower boundary of the kernel (minimum size in mm).
-#' @param h Numeric. Integration bin width in mm.
-#' @param N Numeric. Approximated target total population size (number of individuals).
-#' @param accuracy Numeric. Minimum accepted absolute error between realized
-#'   and target \code{N}. Default is \code{0.001}.
-#' @param meanSize Numeric. Mean of the log-normal size distribution in natural
-#'   scale (mm). Default is \code{130}.
-#' @param sdSize Numeric. Standard deviation of the log-normal size distribution
-#'   in natural scale. Default is \code{1.8}.
-#'
-#' @return A named list with elements \code{meshpts} (numeric vector of mesh
-#'   points), \code{Nvec} (numeric vector of individual counts per mesh point),
-#'   and \code{h} (integration bin width).
-#' @export
-init_pop <- function(
-  params,
-  L,
-  h,
-  N,
-  accuracy = 0.001,
-  meanSize = 130,
-  sdSize = 1.8
-){
-  # Compute mesh points
-  Lmax <- round(params[['growth']]['Lmax'], 0)
-  m <- length(seq(L, Lmax, h))
-  msh <- L + ((1:m) - 1/2) * h
-
-  if(N < 0)
-  {
-    stop('Argument `N` must be larger or equal than zero.')
-  }
-  # In case `N` equal zero, return empty dist vector
-  else if(N == 0)
-  {
-    N_out <- rep(0, length(msh))
-  }
-  # Generate smooth size dist in function of N
-  else
-  {
-    # generate random individuals from the lognorm distribution
-    dbh <- qlnorm(
-      runif(
-        n = 1e4,
-        min = plnorm(min(msh), log(meanSize), log(sdSize)),
-        max = plnorm(
-          Lmax, log(meanSize), log(sdSize)
-        )
-      ),
-      log(meanSize), log(sdSize)
-    )
-
-    # get density distribution from genereted individual sizes
-    dbh_den <- density(dbh, n = length(msh))$y
-
-    # transform density distribution to approximate total pop size to
-    # the expected N argument
-    diff_N <- N - sum(dbh_den)
-
-    fct <- 1
-    Min = 0; Max = N * 5
-    while(abs(diff_N) > accuracy) {
-      fct = runif(1, Min, Max)
-      new_dbh_den <- dbh_den * fct
-      diff_N <- N - sum(new_dbh_den)
-      if(diff_N > 0) {
-        Min = fct
-      }else{
-        Max = fct
-      }
-    }
-
-    N_out <- dbh_den * fct
-  }
-
-  return(
-    list(
-      meshpts = msh,
-      Nvec = N_out,
-      h = h
-    )
-  )
-}

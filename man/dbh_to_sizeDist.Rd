@@ -9,7 +9,7 @@ dbh_to_sizeDist(dbh, N_intra)
 \arguments{
 \item{dbh}{Numeric vector. Individual tree diameters in mm.}
 
-\item{N_intra}{List. Size distribution object; output of \code{init_pop()}.}
+\item{N_intra}{List. Size distribution object.}
 }
 \value{
 A copy of \code{N_intra} with \code{$Nvec} replaced by the count of

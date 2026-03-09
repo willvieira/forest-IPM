@@ -20,11 +20,10 @@ size_to_BAind <- function(
 #' Converts an individual size distribution vector into plot-level basal area
 #' (m2/ha).
 #'
-#' @param N List. Size distribution object; output of \code{init_pop()}.
+#' @param N List. Size distribution object.
 #' @param plot_size Numeric. Plot area in square meters.
 #'
 #' @return Numeric scalar. Total basal area in m2/ha.
-#' @export
 size_to_BAplot <- function(
 	N,
 	plot_size
@@ -70,11 +69,10 @@ size_to_BAcomp <- function(
 #' by an \code{init_pop()} output object.
 #'
 #' @param dbh Numeric vector. Individual tree diameters in mm.
-#' @param N_intra List. Size distribution object; output of \code{init_pop()}.
+#' @param N_intra List. Size distribution object.
 #'
 #' @return A copy of \code{N_intra} with \code{$Nvec} replaced by the count of
 #'   individuals in each mesh size class.
-#' @export
 dbh_to_sizeDist <- function(
 	dbh,
 	N_intra
