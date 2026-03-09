@@ -36,42 +36,10 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
   Prec <- if (is.function(env$MAP)) env$MAP(0) else env$MAP
 
   # Build size distributions from stand data for ALL species in stand + focal species.
-  # Observed tree sizes determine the distribution; init_pop() is not used.
+  # Observed tree sizes determine the distribution.
   all_species <- union(stand$species, focal_species)
 
-  nvec_list <- lapply(stats::setNames(all_species, all_species), function(sp) {
-    sp_trees <- stand$trees$size_mm[stand$trees$species_id == sp]
-    sp_pars  <- pars$species_params[[sp]]$fixed
-
-    # Upper mesh bound: Lmax from params if available, else from observed sizes
-    lmax <- if (!is.null(sp_pars) && !is.null(sp_pars$growth)) {
-      round(sp_pars$growth["Lmax"], 0)
-    } else if (length(sp_trees) > 0) {
-      ceiling(max(sp_trees)) + bin_w * 5L
-    } else {
-      500L
-    }
-
-    m   <- max(1L, as.integer(ceiling((lmax - 127) / bin_w)))
-    msh <- 127 + ((seq_len(m)) - 0.5) * bin_w
-    out <- list(meshpts = msh, Nvec = rep(0.0, m), h = bin_w)
-
-    if (length(sp_trees) > 0) out <- dbh_to_sizeDist(dbh = sp_trees, N_intra = out)
-    out
-  })
-
-  # Aggregate competitors onto focal mesh via linear interpolation
-  .make_inter <- function(focal_sp, nvec_list) {
-    other_sp <- setdiff(names(nvec_list), focal_sp)
-    if (length(other_sp) == 0) return(nvec_list[[focal_sp]])
-    focal_mesh <- nvec_list[[focal_sp]]
-    inter_nvec <- rowSums(sapply(other_sp, function(sp) {
-      stats::approx(nvec_list[[sp]]$meshpts, nvec_list[[sp]]$Nvec,
-                    xout = focal_mesh$meshpts, rule = 2)$y
-    }))
-    focal_mesh$Nvec <- inter_nvec
-    focal_mesh
-  }
+  nvec_list <- .stand_to_nvec(stand, all_species, pars, bin_w)
 
   # Compute lambda only for focal species
   lambdas <- vapply(focal_species, function(sp) {
@@ -90,12 +58,9 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
       pars$species_params[[sp]]$random_effects
     }
 
-    Nvec_intra <- nvec_list[[sp]]
-    Nvec_inter <- .make_inter(sp, nvec_list)
-
     K_list <- mkKernel(
-      Nvec_intra  = Nvec_intra,
-      Nvec_inter  = Nvec_inter,
+      Nvec_intra  = nvec_list[[sp]]$N_con,
+      Nvec_inter  = nvec_list[[sp]]$N_het,
       delta_time  = delta_time,
       plotSize    = stand$plot_size,
       Temp        = Temp,

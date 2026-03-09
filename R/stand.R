@@ -112,3 +112,97 @@ summary.ipm_stand <- function(object, ...) {
   }
   invisible(object)
 }
+
+# Internal: build nvec_list (species -> list(N_con, N_het)) from a stand object.
+# Mirrors the approach in lambda(): uses dbh_to_sizeDist to bin observed tree
+# sizes into the species mesh. N_het pools all trees that are not conspecific.
+.stand_to_nvec <- function(stand, species, pars, bin_w) {
+  lapply(stats::setNames(species, species), function(sp) {
+    sp_pars     <- pars$species_params[[sp]]$fixed
+    sp_trees    <- stand$trees$size_mm[stand$trees$species_id == sp]
+    other_trees <- stand$trees$size_mm[stand$trees$species_id != sp]
+
+    lmax <- if (!is.null(sp_pars) && !is.null(sp_pars$growth)) {
+      ceiling(sp_pars$growth[["Lmax"]])
+    } else if (length(sp_trees) > 0) {
+      ceiling(max(sp_trees)) + bin_w * 5L
+    } else {
+      500L
+    }
+
+    m      <- max(1L, as.integer(ceiling((lmax - 127) / bin_w)))
+    msh    <- 127 + ((seq_len(m)) - 0.5) * bin_w
+    N_zero <- list(meshpts = msh, Nvec = rep(0.0, m), h = bin_w)
+
+    N_con <- if (length(sp_trees)    > 0) dbh_to_sizeDist(sp_trees,    N_zero) else N_zero
+    N_het <- if (length(other_trees) > 0) dbh_to_sizeDist(other_trees, N_zero) else N_zero
+
+    list(N_con = N_con, N_het = N_het)
+  })
+}
+
+# Internal: convert nvec_list back to an ipm_stand for storage in $stand_series
+.nvec_to_stand <- function(nvec_list, species, plot_size) {
+  tree_rows <- lapply(species, function(sp) {
+    nvec  <- nvec_list[[sp]]$N_con
+    n_ind <- round(sum(nvec$Nvec))
+    if (n_ind < 1) return(NULL)
+    sizes <- rep(nvec$meshpts, times = round(nvec$Nvec))
+    data.frame(
+      size_mm    = sizes,
+      species_id = sp,
+      plot_size  = plot_size,
+      stringsAsFactors = FALSE
+    )
+  })
+  tree_rows <- Filter(Negate(is.null), tree_rows)
+  if (length(tree_rows) == 0) {
+    trees_df <- data.frame(size_mm = numeric(0), species_id = character(0),
+                           plot_size = numeric(0), stringsAsFactors = FALSE)
+  } else {
+    trees_df <- do.call(rbind, tree_rows)
+  }
+  structure(
+    list(trees = trees_df, species = species, plot_size = plot_size),
+    class = "ipm_stand"
+  )
+}
+
+#' @export
+print.ipm_projection <- function(x, ...) {
+  store_every <- if (length(x$years) > 1) x$years[2] - x$years[1] else 1
+  cat(sprintf("<ipm_projection>  %d species | %d years | store_every=%d\n",
+              length(x$species),
+              if (length(x$years) > 0) max(x$years) else 0,
+              store_every))
+  invisible(x)
+}
+
+# Internal: recompute N_het for all focal_species from the current N_con Nvec
+# objects. Bins each competitor's distribution onto the focal mesh using
+# findInterval on the focal bin boundaries — sizes beyond the focal lmax are
+# accumulated into the last bin so no individuals are lost.
+# Returns the full nvec_list with N_het updated for focal_species.
+.update_N_het <- function(focal_species, nvec_list) {
+  updated <- lapply(stats::setNames(focal_species, focal_species), function(sp) {
+    other_sp <- setdiff(names(nvec_list), sp)
+    N_con    <- nvec_list[[sp]]$N_con
+    m        <- length(N_con$meshpts)
+    breaks   <- N_con$meshpts[1L] - N_con$h / 2 + (0:m) * N_con$h
+
+    N_het      <- N_con
+    N_het$Nvec <- if (length(other_sp) == 0) {
+      rep(0.0, m)
+    } else {
+      Reduce(`+`, lapply(other_sp, function(s) {
+        comp    <- nvec_list[[s]]$N_con
+        bins    <- pmax(1L, pmin(findInterval(comp$meshpts, breaks), m))
+        out     <- numeric(m)
+        for (i in seq_along(bins)) out[bins[i]] <- out[bins[i]] + comp$Nvec[i]
+        out
+      }))
+    }
+    modifyList(nvec_list[[sp]], list(N_het = N_het))
+  })
+  modifyList(nvec_list, updated)
+}

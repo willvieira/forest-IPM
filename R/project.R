@@ -60,41 +60,10 @@ project <- function(mod, pars, stand, env, ctrl) {
   delta_time <- ctrl$delta_time
 
   # Build size distributions from stand data
-  nvec_list <- lapply(stats::setNames(all_species, all_species), function(sp) {
-    sp_trees <- stand$trees$size_mm[stand$trees$species_id == sp]
-    sp_pars  <- pars$species_params[[sp]]$fixed
-
-    lmax <- if (!is.null(sp_pars) && !is.null(sp_pars$growth)) {
-      round(sp_pars$growth["Lmax"], 0)
-    } else if (length(sp_trees) > 0) {
-      ceiling(max(sp_trees)) + bin_w * 5L
-    } else {
-      500L
-    }
-
-    m   <- max(1L, as.integer(ceiling((lmax - 127) / bin_w)))
-    msh <- 127 + ((seq_len(m)) - 0.5) * bin_w
-    out <- list(meshpts = msh, Nvec = rep(0.0, m), h = bin_w)
-
-    if (length(sp_trees) > 0) out <- dbh_to_sizeDist(dbh = sp_trees, N_intra = out)
-    out
-  })
+  nvec_list <- .stand_to_nvec(stand, all_species, pars, bin_w)
 
   # Static competitors: save initial Nvec, never update
   static_nvec <- nvec_list[static_comp]
-
-  # Helper: aggregate competitors onto focal mesh
-  .make_inter <- function(focal_sp, nvec_list) {
-    other_sp <- setdiff(names(nvec_list), focal_sp)
-    if (length(other_sp) == 0) return(nvec_list[[focal_sp]])
-    focal_mesh <- nvec_list[[focal_sp]]
-    inter_nvec <- rowSums(sapply(other_sp, function(sp) {
-      stats::approx(nvec_list[[sp]]$meshpts, nvec_list[[sp]]$Nvec,
-                    xout = focal_mesh$meshpts, rule = 2)$y
-    }))
-    focal_mesh$Nvec <- inter_nvec
-    focal_mesh
-  }
 
   # Storage
   stored_t     <- integer(0)
@@ -121,12 +90,9 @@ project <- function(mod, pars, stand, env, ctrl) {
         pars$species_params[[sp]]$random_effects
       }
       
-      Nvec_intra <- nvec_list[[sp]]
-      Nvec_inter <- .make_inter(sp, nvec_list)
-
       K_list <- mkKernel(
-        Nvec_intra  = Nvec_intra,
-        Nvec_inter  = Nvec_inter,
+        Nvec_intra  = nvec_list[[sp]]$N_con,
+        Nvec_inter  = nvec_list[[sp]]$N_het,
         delta_time  = delta_time,
         plotSize    = stand$plot_size,
         Temp        = Temp,
@@ -135,16 +101,14 @@ project <- function(mod, pars, stand, env, ctrl) {
         plot_random = plot_random
       )
 
-      new_nvec            <- Nvec_intra
-      new_nvec$Nvec       <- as.numeric(K_list$K %*% Nvec_intra$Nvec)
-      new_nvec_list[[sp]] <- new_nvec
+      new_nvec_list[[sp]]$N_con$Nvec <- as.numeric(K_list$K %*% nvec_list[[sp]]$N_con$Nvec)
 
       if (ctrl$compute_lambda) {
         lambdas_t[[sp]] <- max(getEigenValues(K_list$K))
       }
     }
 
-    nvec_list <- new_nvec_list
+    nvec_list <- .update_N_het(mod$species, new_nvec_list)
 
     if (t %% ctrl$store_every == 0) {
       stored_t <- c(stored_t, t)
@@ -161,7 +125,7 @@ project <- function(mod, pars, stand, env, ctrl) {
           timestep   = t,
           species_id = sp,
           lambda     = lambdas_t[[sp]],
-          n_trees    = as.integer(round(sum(nvec_list[[sp]]$Nvec))),
+          n_trees    = as.integer(round(sum(nvec_list[[sp]]$N_con$Nvec))),
           stringsAsFactors = FALSE
         )))
       }
@@ -180,43 +144,6 @@ project <- function(mod, pars, stand, env, ctrl) {
     ),
     class = "ipm_projection"
   )
-}
-
-# Internal: convert nvec_list back to an ipm_stand for storage in $stand_series
-.nvec_to_stand <- function(nvec_list, species, plot_size) {
-  tree_rows <- lapply(species, function(sp) {
-    nvec  <- nvec_list[[sp]]
-    n_ind <- round(sum(nvec$Nvec))
-    if (n_ind < 1) return(NULL)
-    sizes <- rep(nvec$meshpts, times = round(nvec$Nvec))
-    data.frame(
-      size_mm    = sizes,
-      species_id = sp,
-      plot_size  = plot_size,
-      stringsAsFactors = FALSE
-    )
-  })
-  tree_rows <- Filter(Negate(is.null), tree_rows)
-  if (length(tree_rows) == 0) {
-    trees_df <- data.frame(size_mm = numeric(0), species_id = character(0),
-                           plot_size = numeric(0), stringsAsFactors = FALSE)
-  } else {
-    trees_df <- do.call(rbind, tree_rows)
-  }
-  structure(
-    list(trees = trees_df, species = species, plot_size = plot_size),
-    class = "ipm_stand"
-  )
-}
-
-#' @export
-print.ipm_projection <- function(x, ...) {
-  store_every <- if (length(x$years) > 1) x$years[2] - x$years[1] else 1
-  cat(sprintf("<ipm_projection>  %d species | %d years | store_every=%d\n",
-              length(x$species),
-              if (length(x$years) > 0) max(x$years) else 0,
-              store_every))
-  invisible(x)
 }
 
 #' @export
