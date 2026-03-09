@@ -73,8 +73,8 @@ project <- function(mod, pars, stand, env, ctrl) {
 
   # Projection loop
   for (t in seq_len(ctrl$years)) {
-    Temp <- if (is.function(env$MAT)) env$MAT(t) else env$MAT
-    Prec <- if (is.function(env$MAP)) env$MAP(t) else env$MAP
+    Temp <- if (is.function(env$.MAT_scl)) env$.MAT_scl(t) else env$.MAT_scl
+    Prec <- if (is.function(env$.MAP_scl)) env$.MAP_scl(t) else env$.MAP_scl
 
     # Restore static competitor Nvec (unchanged)
     for (sp in static_comp) nvec_list[[sp]] <- static_nvec[[sp]]

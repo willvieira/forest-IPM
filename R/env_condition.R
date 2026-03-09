@@ -1,6 +1,21 @@
 # new_ipm_env: low-level constructor
+# MAT/MAP: natural-scale values (or functions)
+# .MAT_scl/.MAP_scl: scaled [0,1] values (or functions) used by engines
 new_ipm_env <- function(MAT, MAP) {
-  structure(list(MAT = MAT, MAP = MAP), class = "ipm_env")
+  if (is.function(MAT)) {
+    MAT_scl <- function(t) scale_env(MAT(t), 0)$MAT
+  } else {
+    MAT_scl <- scale_env(MAT, 0)$MAT
+  }
+  if (is.function(MAP)) {
+    MAP_scl <- function(t) scale_env(0, MAP(t))$MAP
+  } else {
+    MAP_scl <- scale_env(0, MAP)$MAP
+  }
+  structure(
+    list(MAT = MAT, MAP = MAP, .MAT_scl = MAT_scl, .MAP_scl = MAP_scl),
+    class = "ipm_env"
+  )
 }
 
 # validate_ipm_env: checks MAT and MAP types

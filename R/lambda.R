@@ -32,8 +32,8 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
   bin_w      <- ctrl$bin_width
   delta_time <- ctrl$delta_time
 
-  Temp <- if (is.function(env$MAT)) env$MAT(0) else env$MAT
-  Prec <- if (is.function(env$MAP)) env$MAP(0) else env$MAP
+  Temp <- if (is.function(env$.MAT_scl)) env$.MAT_scl(0) else env$.MAT_scl
+  Prec <- if (is.function(env$.MAP_scl)) env$.MAP_scl(0) else env$.MAP_scl
 
   # Build size distributions from stand data for ALL species in stand + focal species.
   # Observed tree sizes determine the distribution.
