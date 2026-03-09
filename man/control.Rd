@@ -4,7 +4,14 @@
 \alias{control}
 \title{Configure IPM projection settings}
 \usage{
-control(years = 100, delta_time = 1, store_every = 1, bin_width = 1)
+control(
+  years = 100,
+  delta_time = 1,
+  store_every = 1,
+  bin_width = 1,
+  compute_lambda = FALSE,
+  progress = TRUE
+)
 }
 \arguments{
 \item{years}{Positive integer. Number of simulation timesteps. Default 100.}
@@ -14,6 +21,13 @@ control(years = 100, delta_time = 1, store_every = 1, bin_width = 1)
 \item{store_every}{Positive integer. Store stand state every N timesteps. Default 1.}
 
 \item{bin_width}{Positive integer. Bin width for IPM kernel discretization. Default 1.}
+
+\item{compute_lambda}{Logical. Whether to compute the asymptotic lambda at each
+timestep via eigendecomposition. Set to FALSE to skip (faster projections when
+only population structure is needed). Default FALSE}
+
+\item{progress}{Logical. Whether to display a progress bar during projection.
+Default TRUE.}
 }
 \value{
 An object of S3 class \code{"ipm_control"}.

@@ -9,20 +9,22 @@ lambda(mod, pars, stand, env, ctrl = NULL)
 \arguments{
 \item{mod}{An \code{ipm_spModel} object.}
 
-\item{pars}{An \code{ipm_parameters} object. Must contain parameters for all
-species in \code{mod}.}
+\item{pars}{An \code{ipm_parameters} object. Must contain parameters for at
+least one species in \code{mod}. Lambda is computed only for species present
+in both \code{mod} and \code{pars} — other species in \code{stand} are used
+as competitors but do not appear in the output.}
 
-\item{stand}{An \code{ipm_stand} object. Initial size distribution.}
+\item{stand}{An \code{ipm_stand} object. Provides size distributions for all
+species (focal and competitors).}
 
 \item{env}{An \code{ipm_env} object. Climate drivers.}
 
 \item{ctrl}{An \code{ipm_control} object or NULL. Only \code{bin_width} and
-\code{delta_time} are used; \code{years} and \code{store_every} are ignored.
-If NULL, defaults are used (bin_width = 1, delta_time = 1).}
+\code{delta_time} are used. If NULL, defaults are used.}
 }
 \value{
 An object of S3 class \code{"ipm_lambda"} — a named numeric vector
-with one element per species in \code{mod}.
+with one element per focal species (species with available parameters).
 }
 \description{
 Compute the asymptotic population growth rate (lambda) per species

@@ -12,7 +12,9 @@ parameters(mod, draw = "random", seed = NULL)
 \item{draw}{Character \code{"mean"} or \code{"random"}, or a positive integer
 1-1000 selecting a specific posterior draw index.}
 
-\item{seed}{Integer or NULL. Random seed used only when \code{draw = "random"}.}
+\item{seed}{Integer or NULL. Random seed. When \code{draw = "random"} and
+\code{seed = NULL}, a seed is auto-generated so the draw is reproducible.
+Retrieve it from \code{$seed} on the returned object.}
 }
 \value{
 An object of S3 class \code{"ipm_parameters"}.

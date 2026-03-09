@@ -19,8 +19,9 @@ project(mod, pars, stand, env, ctrl)
 }
 \value{
 An object of S3 class \code{"ipm_projection"} with fields:
-\code{$species}, \code{$years}, \code{$lambda}, \code{$stand_series},
-\code{$summary}.
+\code{$species}, \code{$years}, \code{$lambda}, \code{$stand_series}
+(list of \code{ipm_dist_snapshot} objects, each holding the continuous
+size distribution per species at that timestep), \code{$summary}.
 }
 \description{
 Project population dynamics over time
