@@ -141,30 +141,17 @@ summary.ipm_stand <- function(object, ...) {
   })
 }
 
-# Internal: convert nvec_list back to an ipm_stand for storage in $stand_series
+# Internal: snapshot nvec_list as continuous size distributions for $stand_series.
+# Returns an ipm_dist_snapshot: a named list (by species) of data frames with
+# columns size_mm (mesh midpoints) and density (continuous Nvec, fractional individuals).
 .nvec_to_stand <- function(nvec_list, species, plot_size) {
-  tree_rows <- lapply(species, function(sp) {
-    nvec  <- nvec_list[[sp]]$N_con
-    n_ind <- round(sum(nvec$Nvec))
-    if (n_ind < 1) return(NULL)
-    sizes <- rep(nvec$meshpts, times = round(nvec$Nvec))
-    data.frame(
-      size_mm    = sizes,
-      species_id = sp,
-      plot_size  = plot_size,
-      stringsAsFactors = FALSE
-    )
-  })
-  tree_rows <- Filter(Negate(is.null), tree_rows)
-  if (length(tree_rows) == 0) {
-    trees_df <- data.frame(size_mm = numeric(0), species_id = character(0),
-                           plot_size = numeric(0), stringsAsFactors = FALSE)
-  } else {
-    trees_df <- do.call(rbind, tree_rows)
-  }
+  dists <- stats::setNames(lapply(species, function(sp) {
+    nvec <- nvec_list[[sp]]$N_con
+    data.frame(size_mm = nvec$meshpts, density = nvec$Nvec, stringsAsFactors = FALSE)
+  }), species)
   structure(
-    list(trees = trees_df, species = species, plot_size = plot_size),
-    class = "ipm_stand"
+    list(distributions = dists, species = species, plot_size = plot_size),
+    class = "ipm_dist_snapshot"
   )
 }
 

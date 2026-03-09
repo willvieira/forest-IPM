@@ -6,8 +6,9 @@
 #' @param env An \code{ipm_env} object. Climate drivers (may be time-varying).
 #' @param ctrl An \code{ipm_control} object. Required.
 #' @return An object of S3 class \code{"ipm_projection"} with fields:
-#'   \code{$species}, \code{$years}, \code{$lambda}, \code{$stand_series},
-#'   \code{$summary}.
+#'   \code{$species}, \code{$years}, \code{$lambda}, \code{$stand_series}
+#'   (list of \code{ipm_dist_snapshot} objects, each holding the continuous
+#'   size distribution per species at that timestep), \code{$summary}.
 #' @export
 project <- function(mod, pars, stand, env, ctrl) {
   if (!inherits(mod,   "ipm_spModel"))    cli::cli_abort("{.arg mod} must be {.cls ipm_spModel}.")
