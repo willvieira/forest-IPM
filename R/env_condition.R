@@ -46,6 +46,63 @@ env_condition <- function(MAT, MAP) {
   validate_ipm_env(new_ipm_env(MAT = MAT, MAP = MAP))
 }
 
+# warn_env_range: issues a warning for species whose static MAT/MAP falls
+# outside the range observed in the training data.
+# species: character vector of focal species IDs
+warn_env_range <- function(env, species) {
+  static_MAT <- if (is.numeric(env$MAT)) env$MAT else NULL
+  static_MAP <- if (is.numeric(env$MAP)) env$MAP else NULL
+
+  if (is.null(static_MAT) && is.null(static_MAP)) return(invisible(NULL))
+
+  sp_tbl <- supported_species()
+  sp_tbl <- sp_tbl[sp_tbl$species_id %in% species, ]
+  if (nrow(sp_tbl) == 0L) return(invisible(NULL))
+
+  out_msgs <- character(0)
+
+  for (i in seq_len(nrow(sp_tbl))) {
+    sp   <- sp_tbl$species_id[i]
+    name <- sp_tbl$common_name[i]
+    msgs <- character(0)
+
+    if (!is.null(static_MAT)) {
+      if (static_MAT < sp_tbl$MAT_min[i] || static_MAT > sp_tbl$MAT_max[i]) {
+        msgs <- c(msgs, sprintf(
+          "MAT = %.1f\u00b0C is outside the observed range [%.1f, %.1f]\u00b0C",
+          static_MAT, sp_tbl$MAT_min[i], sp_tbl$MAT_max[i]
+        ))
+      }
+    }
+
+    if (!is.null(static_MAP)) {
+      if (static_MAP < sp_tbl$MAP_min[i] || static_MAP > sp_tbl$MAP_max[i]) {
+        msgs <- c(msgs, sprintf(
+          "MAP = %.0f mm/yr is outside the observed range [%.0f, %.0f] mm/yr",
+          static_MAP, sp_tbl$MAP_min[i], sp_tbl$MAP_max[i]
+        ))
+      }
+    }
+
+    if (length(msgs) > 0L) {
+      out_msgs <- c(out_msgs, stats::setNames(
+        paste0(name, " (", sp, "): ", paste(msgs, collapse = "; ")),
+        "*"
+      ))
+    }
+  }
+
+  if (length(out_msgs) > 0L) {
+    cli::cli_warn(c(
+      "Environmental conditions are outside the range observed for {length(out_msgs)} species.",
+      "!" = "Model extrapolation may be unreliable.",
+      out_msgs
+    ))
+  }
+
+  invisible(NULL)
+}
+
 #' @export
 print.ipm_env <- function(x, ...) {
   mat_str <- if (is.function(x$MAT)) "<function>" else sprintf("%.1f\u00b0C", x$MAT)

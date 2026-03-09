@@ -6,6 +6,8 @@
 ## (strip leading digits), and rebuilds species_list.csv with the structure:
 ##   species_id, common_name, nom_commun, growth_model, surv_model, recruit_model
 
+library(dplyr)
+
 data_path <- trimws(readLines("_data.path"))
 
 # ---------------------------------------------------------------------------
@@ -51,20 +53,39 @@ sp_filtered <- sp_source[sp_source$sp_to_analyze == TRUE, ]
 sp_filtered$species_id <- sub("^[0-9]+", "", sp_filtered$species_id_new)
 
 # ---------------------------------------------------------------------------
+# Extract environmental range per species
+# ---------------------------------------------------------------------------
+env_summary <- readRDS(file.path(data_path, "treeData.RDS")) |>
+  filter(species_id %in% sp_source$species_id_old) |>
+  group_by(species_id) |>
+  reframe(
+    MAT_min = min(bio_01_mean, na.rm = TRUE),
+    MAT_max = max(bio_01_mean, na.rm = TRUE),
+    MAP_min = min(bio_12_mean, na.rm = TRUE),
+    MAP_max = max(bio_12_mean, na.rm = TRUE)
+  ) |>
+  mutate(across(starts_with("MA"), ~ round(.x, 1))) |>
+  left_join(
+    sp_source |>
+      select(species_id = species_id_old, species_id_new, sp_to_analyze)
+  ) |>
+  filter(sp_to_analyze == TRUE) |>
+  mutate(species_id = sub("^[0-9]+", "", species_id_new)) |>
+  select(!c(species_id_new, sp_to_analyze))
+
+# ---------------------------------------------------------------------------
 # Build output
 # ---------------------------------------------------------------------------
-output <- merge(
-  sp_filtered[, "species_id", drop = FALSE],
-  common_names,
-  by = "species_id",
-  all.x = TRUE
-)
-
-output$growth_model  <- "intcpt_plot_comp_clim"
-output$surv_model    <- "intcpt_plot_comp_clim"
-output$recruit_model <- "intcpt_plot_comp_clim"
-
-output <- output[order(output$species_id), ]
+output <- sp_filtered |>
+  select(species_id) |>
+  left_join(common_names) |>
+  left_join(env_summary) |>
+  mutate(
+    growth_model = "intcpt_plot_comp_cl",
+    surv_model = "intcpt_plot_comp_cl",
+    recruit_model = "intcpt_plot_comp_clim"
+  ) |>
+  arrange(species_id)
 
 # ---------------------------------------------------------------------------
 # Write

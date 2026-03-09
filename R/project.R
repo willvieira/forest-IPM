@@ -55,6 +55,8 @@ project <- function(mod, pars, stand, env, ctrl) {
     }
   }
 
+  warn_env_range(env, mod$species)
+
   all_species <- c(mod$species, stand_only)
 
   bin_w      <- ctrl$bin_width

@@ -28,6 +28,8 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
     )
   }
 
+  warn_env_range(env, focal_species)
+
   if (is.null(ctrl)) ctrl <- control()
   bin_w      <- ctrl$bin_width
   delta_time <- ctrl$delta_time
