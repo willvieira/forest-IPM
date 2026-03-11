@@ -95,10 +95,12 @@ Plans:
 
 ### Phase 6: Run tests with profvis to check for potential efficiency gains
 
-**Goal:** [To be planned]
+**Goal:** Profile the core IPM computation pipeline with profvis, revamp R/ code to consistent tidyverse style, and apply targeted optimizations based on profiling evidence
 **Requirements**: TBD
 **Depends on:** Phase 5
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 6 to break down)
+- [ ] 06-01-PLAN.md — Capture pre-optimization baselines and apply tidyverse-style revamp to all R/ source files
+- [ ] 06-02-PLAN.md — Write and run profvis benchmarking script, produce PROFILING.md with hotspot analysis and flamegraph
+- [ ] 06-03-PLAN.md — Apply approved optimizations to kernel.R/project.R, run before/after benchmark, update PROFILING.md
