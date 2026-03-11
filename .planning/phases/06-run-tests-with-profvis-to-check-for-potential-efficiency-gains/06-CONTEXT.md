@@ -25,7 +25,7 @@ Profile the core IPM computation pipeline with profvis, revamp R/ code toward co
 
 - **Benchmark inputs:**
   - Single-species run: 1 species (QUERUB — large max size stresses big kernel), 100 timesteps via `project()`
-  - Multi-species run: 2–3 species including QUERUB, 100 timesteps — exposes competition update costs
+  - Multi-species run: 2-3 species including QUERUB and QUEPRI, 100 timesteps — exposes competition update costs
   - Rationale: single vs multi-species expose different code paths
 - **Skill to use:** `r-skills:r-performance`
 - **Output deliverables:**
