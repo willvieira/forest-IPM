@@ -82,3 +82,23 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 2. Package Skeleton and Bug Fixes | 3/3 | Complete   | 2026-03-04 |
 | 3. Remote Data Layer | 0/TBD | Not started | - |
 | 4. Documentation and Tests | 0/TBD | Not started | - |
+
+### Phase 5: Create script to compare results between old version of the package and this new versions (specially eigen computation). We can use simulation outputs from simulations folder and compare their results with the same output from our new R package
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 4
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 5 to break down)
+
+### Phase 6: Run tests with profvis to check for potential efficiency gains
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 6 to break down)
