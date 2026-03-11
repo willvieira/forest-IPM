@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 02-03-PLAN.md. R package infrastructure complete: DESCRIPTION, NAMESPACE, globals.R, .Rbuildignore, man/. R CMD check --no-install: 0 errors, 0 warnings, 0 notes. Phase 2 all plans complete."
-last_updated: "2026-03-04T16:46:29.467Z"
+stopped_at: Phase 6 context gathered
+last_updated: "2026-03-11T22:07:30.194Z"
 last_activity: 2026-03-04 — Plan 02-02 executed and verified
 progress:
-  total_phases: 4
+  total_phases: 6
   completed_phases: 2
   total_plans: 4
   completed_plans: 4
@@ -58,6 +58,8 @@ Progress: [██████░░░░] 62%
 ### Roadmap Evolution
 
 - Phase 1 (API Design) inserted before all existing phases: existing phases renumbered 1→2, 2→3, 3→4
+- Phase 5 added: Create script to compare results between old version of the package and this new versions (specially eigen computation). We can use simulation outputs from simulations folder and compare their results with the same output from our new R package
+- Phase 6 added: Run tests with profvis to check for potential efficiency gains
 
 ### Decisions
 
@@ -97,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-04T16:46:29.463Z
-Stopped at: Completed 02-03-PLAN.md. R package infrastructure complete: DESCRIPTION, NAMESPACE, globals.R, .Rbuildignore, man/. R CMD check --no-install: 0 errors, 0 warnings, 0 notes. Phase 2 all plans complete.
-Resume file: None
+Last session: 2026-03-11T22:07:30.189Z
+Stopped at: Phase 6 context gathered
+Resume file: .planning/phases/06-run-tests-with-profvis-to-check-for-potential-efficiency-gains/06-CONTEXT.md
