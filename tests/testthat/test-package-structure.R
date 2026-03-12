@@ -11,7 +11,7 @@ test_that("DESCRIPTION Imports includes all required runtime packages", {
   desc <- read.dcf(file.path(pkg, "DESCRIPTION"))
   imports <- desc[, "Imports"]
   required <- c("Rcpp", "cli", "dplyr", "tidyr", "purrr", "stringr",
-                 "stringdist", "rlang", "magrittr", "tibble", "truncnorm")
+                 "stringdist", "rlang", "magrittr", "tibble")
   for (pkg_name in required) {
     expect_true(grepl(pkg_name, imports), label = paste("Imports contains", pkg_name))
   }

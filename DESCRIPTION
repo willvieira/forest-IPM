@@ -20,8 +20,7 @@ Imports:
     stringdist (>= 0.9.10),
     rlang (>= 1.1.4),
     magrittr (>= 2.0.3),
-    tibble (>= 3.2.1),
-    truncnorm (>= 1.0-9)
+    tibble (>= 3.2.1)
 LinkingTo:
     Rcpp,
     RcppEigen
