@@ -182,3 +182,44 @@ The following optimization targets have been approved for implementation in Plan
 
 - **Target 3 (BA caching):** Deferred — evaluate residual profile after Targets 1+2 to determine if BA metrics (~10%) remain significant enough to warrant the implementation complexity
 - **Target 4 (C++ migration):** Deferred — Xcode license blocker (see STATE.md) must be resolved first; also likely unnecessary if Targets 1+2 achieve 50–70% reduction
+
+---
+
+## Before/After Benchmark Results
+
+**Date:** 2026-03-12
+**Machine:** macOS Darwin 24.6.0
+**Method:** microbenchmark — 50 reps for "after" measurements, 10 reps for "before" (slow outer path)
+**Mesh:** QUERUB, 2235 × 2235 = 4,995,225 cells per kernel build
+
+### Target 1: Vectorize outer() — P matrix component
+
+| Metric | Before (outer) | After (vectorized) | Speedup |
+|--------|----------------|--------------------|---------|
+| Median | 142.0 ms | 141.3 ms | 1.0x (no gain) |
+| Notes | outer() dispatch overhead for P_xEC minimal when vectorized calls are comparable | — |
+
+**Interpretation:** Vectorizing the P matrix outer() call alone provides negligible speedup. The `P_xEC` callback (vonBertalanffy_lk + survival_f) is fast enough that the dispatch overhead is small relative to the computation. The key finding is that P matrix cost (~140 ms) is now primarily the arithmetic in `vonBertalanffy_lk` and `survival_f`, not function call dispatch.
+
+### Target 2: Replace truncnorm::dtruncnorm with dnorm/pnorm — F matrix component
+
+| Metric | Before (outer + truncnorm) | After (vectorized + dnorm/pnorm) | Speedup |
+|--------|----------------------------|---------------------------------|---------|
+| Median | 427.5 ms | 174.6 ms | **2.4x faster** |
+| Savings per timestep | — | ~253 ms | 59% reduction |
+| Savings per 100-year run | — | ~25 s | — |
+
+**Interpretation:** This is the dominant gain. Replacing `truncnorm::dtruncnorm` (46% inclusive hotspot) with base R `dnorm`/`pnorm` eliminates per-call R-to-C boundary overhead for ~5M calls. The vectorized rep()/matrix() pattern compounds this by passing a single n²-element vector to `dnorm`/`pnorm` instead of invoking them via outer() dispatch 4,995,225 times.
+
+### Combined: Full mkKernel() performance
+
+| Metric | Before | After | Speedup |
+|--------|--------|-------|---------|
+| Median (single call) | ~761 ms | 542.4 ms | **1.4x faster** |
+| IQR | — | 532–566 ms | — |
+| Total cost (100 timesteps) | ~76 s | ~54 s | **~22 s saved** |
+| Percent reduction | — | — | **28.7%** |
+
+### Summary
+
+Targets 1 and 2 were co-applied (required — Target 2 gain depends on vectorized inputs from Target 1). The measured speedup is **1.4x** (28.7% reduction) for a single `mkKernel()` call, bringing a 100-year single-species run from ~76 seconds to ~54 seconds (~22 seconds saved). The gain was driven almost entirely by Target 2 (replacing truncnorm::dtruncnorm with dnorm/pnorm in the F matrix, 2.4x speedup for that component). Target 1 (vectorize outer()) produced no measurable gain for the P matrix alone — the R-to-C dispatch overhead for P_xEC was minimal. The combined expected 50–70% reduction estimated in the profiling analysis was not achieved; the actual gain was 29%. Target 3 (BA caching, ~10% theoretical gain) remains deferred. Target 4 (C++ migration) remains deferred pending Xcode license resolution.
