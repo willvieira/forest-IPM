@@ -223,3 +223,12 @@ The following optimization targets have been approved for implementation in Plan
 ### Summary
 
 Targets 1 and 2 were co-applied (required — Target 2 gain depends on vectorized inputs from Target 1). The measured speedup is **1.4x** (28.7% reduction) for a single `mkKernel()` call, bringing a 100-year single-species run from ~76 seconds to ~54 seconds (~22 seconds saved). The gain was driven almost entirely by Target 2 (replacing truncnorm::dtruncnorm with dnorm/pnorm in the F matrix, 2.4x speedup for that component). Target 1 (vectorize outer()) produced no measurable gain for the P matrix alone — the R-to-C dispatch overhead for P_xEC was minimal. The combined expected 50–70% reduction estimated in the profiling analysis was not achieved; the actual gain was 29%. Target 3 (BA caching, ~10% theoretical gain) remains deferred. Target 4 (C++ migration) remains deferred pending Xcode license resolution.
+
+---
+
+## Sign-off
+
+**Approved by:** Human
+**Date:** 2026-03-12
+
+The optimization results have been reviewed and approved. Regression tests confirmed that lambda() and project() outputs are numerically identical to pre-optimization baselines (tolerance 1e-10). The before/after benchmark numbers in the section above were accepted. Phase 06 plan 03 is complete.
