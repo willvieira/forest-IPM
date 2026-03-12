@@ -49,3 +49,7 @@ simulations/par.mPop_effect
 src/*.o
 src/*.so
 src/*.dll
+
+# Profiling and benchmark outputs
+*.rds
+*.html
