@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md — baselines captured, tidyverse revamp applied
-last_updated: "2026-03-12T01:45:15.662Z"
+stopped_at: Stopped at checkpoint Task 2 of 06-02-PLAN.md — awaiting human flamegraph review
+last_updated: "2026-03-12T02:03:33.198Z"
 last_activity: 2026-03-04 — Plan 02-02 executed and verified
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 62
 ---
 
@@ -53,6 +53,7 @@ Progress: [██████░░░░] 62%
 | 2 - Package Skeleton and Bug Fixes | 2 | 8 min | 4 min |
 | Phase 02-package-skeleton-and-bug-fixes P03 | 76 | 3 tasks | 21 files |
 | Phase 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains P01 | 85 | 2 tasks | 8 files |
+| Phase 06 P02 | 16 | 1 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,8 @@ Recent decisions affecting current work:
 - [Phase 06-01]: Force-add test fixture RDS files with git add -f to override *.rds gitignore rule; add exception pattern for future tracking
 - [Phase 06-01]: species_model(s) is the correct call — plan template used wrong species= argument that does not exist in function signature
 - [Phase 06-01]: Pre-existing test failures in test-bug-fixes.R (wrong file paths, pkgload::pkg_path() in R CMD check) deferred to deferred-items.md; out of scope for plan 06-01
+- [Phase 06]: F matrix (outer + ingrowth_lk + truncnorm::dtruncnorm) is 2.5x more expensive than P matrix — profiling evidence changes Plan 03 priority order; Targets 1+2 must be co-applied
+- [Phase 06]: truncnorm::dtruncnorm is 46% inclusive hotspot — replace with dnorm/pnorm direct formula in ingrowth_lk (math equivalent, base R vectorizes natively after outer() vectorization)
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T01:45:15.658Z
-Stopped at: Completed 06-01-PLAN.md — baselines captured, tidyverse revamp applied
+Last session: 2026-03-12T02:02:34.572Z
+Stopped at: Stopped at checkpoint Task 2 of 06-02-PLAN.md — awaiting human flamegraph review
 Resume file: None
