@@ -19,9 +19,9 @@ project <- function(mod, pars, stand, env, ctrl) {
 
   # All mod species must have non-NULL parameters in pars
   missing_focal <- setdiff(mod$species, names(pars$species_params))
-  null_focal    <- mod$species[vapply(mod$species, function(sp) {
+  null_focal    <- mod$species[purrr::map_lgl(mod$species, function(sp) {
     is.null(pars$species_params[[sp]]$fixed)
-  }, logical(1))]
+  })]
   bad_focal <- union(missing_focal, null_focal)
   if (length(bad_focal) > 0) {
     cli::cli_abort(c(
@@ -36,9 +36,9 @@ project <- function(mod, pars, stand, env, ctrl) {
 
   if (length(stand_only) > 0) {
     no_pars <- stand_only[!stand_only %in% names(pars$species_params) |
-                            vapply(stand_only, function(sp) {
+                            purrr::map_lgl(stand_only, function(sp) {
                               is.null(pars$species_params[[sp]]$fixed)
-                            }, logical(1))]
+                            })]
 
     if (length(no_pars) > 0) {
       if (mod$on_missing == "error") {
@@ -191,7 +191,7 @@ summary.ipm_projection <- function(object, ...) {
 #' @param ... Additional arguments passed to \code{plot()}.
 #' @export
 plot.ipm_projection <- function(x, y, ...) {
-  if (all(vapply(x$lambda, function(l) all(is.na(l)), logical(1)))) {
+  if (all(purrr::map_lgl(x$lambda, function(l) all(is.na(l))))) {
     message("No lambda values to plot (compute_lambda = FALSE in ctrl).")
     return(invisible(x))
   }

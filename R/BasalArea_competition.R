@@ -56,7 +56,7 @@ size_to_BAcomp <- function(
 	# basal in m2/ha corrected by the number of individuals
 	ba_N_plot = baind * N_focal$Nvec * 1e4/plot_size
 
-	sapply(
+	purrr::map_dbl(
 		N_intra$meshpts,
 		function(x)
 			sum(ba_N_plot[N_focal$meshpts > x])

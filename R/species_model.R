@@ -14,10 +14,10 @@ validate_ipm_spModel <- function(x, on_missing) {
   if (length(bad_ids) > 0) {
     if (on_missing == "error") {
       # Closest-match suggestion using stringdist
-      closest <- vapply(bad_ids, function(id) {
+      closest <- purrr::map_chr(bad_ids, function(id) {
         idx <- stringdist::amatch(id, supported, maxDist = Inf)
         if (is.na(idx)) "<no match>" else supported[idx]
-      }, character(1))
+      })
       cli::cli_abort(c(
         "{.arg x} contains species IDs not found in {.run supported_species()}.",
         "x" = "Unknown: {.val {bad_ids}}.",
@@ -91,7 +91,7 @@ summary.ipm_spModel <- function(object, ...) {
               paste(object$species, collapse = ", ")))
   cat(sprintf("  on_missing: %s\n", object$on_missing))
   cat(sprintf("  Parameters loaded: %d / %d\n",
-              sum(!vapply(object$params, is.null, logical(1))),
+              sum(!purrr::map_lgl(object$params, is.null)),
               length(object$species)))
   invisible(object)
 }

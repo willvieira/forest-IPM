@@ -5,10 +5,9 @@
 
 #' @useDynLib forestIPM, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-#' @importFrom purrr map map_chr
+#' @importFrom purrr map map_chr map_dbl map_lgl
 #' @importFrom dplyr filter group_by reframe select mutate case_match group_split
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @importFrom stringr str_replace
 #' @importFrom rlang .data set_names
-#' @importFrom magrittr %>%
 NULL

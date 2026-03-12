@@ -44,35 +44,38 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
   nvec_list <- .stand_to_nvec(stand, all_species, pars, bin_w)
 
   # Compute lambda only for focal species
-  lambdas <- vapply(focal_species, function(sp) {
-    sp_pars <- pars$species_params[[sp]]$fixed
-    if (is.null(sp_pars)) {
-      cli::cli_abort(
-        "Parameters for focal species {.val {sp}} are NULL. \\
-        Cannot compute lambda — ensure the RDS file for this species is present."
+  lambdas <- purrr::map_dbl(
+    stats::setNames(focal_species, focal_species),
+    function(sp) {
+      sp_pars <- pars$species_params[[sp]]$fixed
+      if (is.null(sp_pars)) {
+        cli::cli_abort(
+          "Parameters for focal species {.val {sp}} are NULL. \\
+          Cannot compute lambda — ensure the RDS file for this species is present."
+        )
+      }
+
+      # Per-species plot-level random effects; default to zero offsets if not set
+      plot_random <- if (is.null(pars$species_params[[sp]]$random_effects)) {
+        c(0, 0, 0)
+      } else {
+        pars$species_params[[sp]]$random_effects
+      }
+
+      K_list <- mkKernel(
+        Nvec_intra  = nvec_list[[sp]]$N_con,
+        Nvec_inter  = nvec_list[[sp]]$N_het,
+        delta_time  = delta_time,
+        plotSize    = stand$plot_size,
+        Temp        = Temp,
+        Prec        = Prec,
+        pars        = sp_pars,
+        plot_random = plot_random
       )
+
+      max(getEigenValues(K_list$K))
     }
-
-    # Per-species plot-level random effects; default to zero offsets if not set
-    plot_random <- if(is.null(pars$species_params[[sp]]$random_effects)) {
-      c(0, 0, 0)
-    }else {
-      pars$species_params[[sp]]$random_effects
-    }
-
-    K_list <- mkKernel(
-      Nvec_intra  = nvec_list[[sp]]$N_con,
-      Nvec_inter  = nvec_list[[sp]]$N_het,
-      delta_time  = delta_time,
-      plotSize    = stand$plot_size,
-      Temp        = Temp,
-      Prec        = Prec,
-      pars        = sp_pars,
-      plot_random = plot_random
-    )
-
-    max(getEigenValues(K_list$K))
-  }, numeric(1))
+  )
 
   structure(lambdas, class = "ipm_lambda")
 }
