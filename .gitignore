@@ -53,3 +53,6 @@ src/*.dll
 # Profiling and benchmark outputs
 *.rds
 *.html
+
+# Exceptions: test fixtures must be tracked
+#!tests/testthat/fixtures/*.rds
