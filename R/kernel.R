@@ -52,18 +52,16 @@ P_xEC = function(
 ingrowth_lk <- function(
   size_t1, size_t0, delta_time, plot_size, BA_adult_sp, BA_adult, Temp, Prec, parsIngrowth, parsSizeIngrowth, plot_random
 ){
+  mu  <- parsSizeIngrowth['size_int'] + parsSizeIngrowth['phi_time'] * delta_time
+  sig <- parsSizeIngrowth['sigma_size']
+
   ingrowth_prob = ingrowth_f(
     parsIngrowth, delta_time, plot_size, BA_adult_sp, BA_adult, Temp, Prec, plot_random
   ) *
-  truncnorm::dtruncnorm(
-    size_t1,
-    a = 127,
-    b = Inf,
-    mean = parsSizeIngrowth['size_int'] + parsSizeIngrowth['phi_time'] * delta_time,
-    sd = parsSizeIngrowth['sigma_size']
-  ) #*
-  # 
-  # (0 + ((1)/(1 + exp(-.5 * (size_t0 - parsRep['Loc'])))^(1)))
+  # Target 2: replace truncnorm::dtruncnorm with base R dnorm/pnorm
+  # Equivalent: dnorm(x, mu, sig) / (1 - pnorm(a, mu, sig)), a=127, b=Inf
+  # Base R dnorm/pnorm vectorize natively; no per-call R-to-C boundary overhead.
+  (dnorm(size_t1, mean = mu, sd = sig) / (1 - pnorm(127, mean = mu, sd = sig)))
 
   return( ingrowth_prob )
 }
@@ -121,17 +119,27 @@ mkKernel = function(
   BAplot_total <- BAplot_intra + BAplot_inter
 
   # kernel
-  P <- h * outer(
-    meshpts, meshpts,
-    P_xEC,
+  # Target 1: vectorized rep()/matrix() replaces outer() to eliminate n^2 R dispatch overhead.
+  # outer(X, Y, FUN) calls FUN(X_expanded, Y_expanded) where:
+  #   X_expanded = rep(X, times = length(Y))   -> FUN's 1st arg (size_t1)
+  #   Y_expanded = rep(Y, each  = length(X))   -> FUN's 2nd arg (size_t0)
+  n  <- length(meshpts)
+  s1 <- rep(meshpts, times = n)   # outer's X_expanded -> 1st arg (size_t1)
+  s0 <- rep(meshpts, each  = n)   # outer's Y_expanded -> 2nd arg (size_t0)
+
+  P_vals <- P_xEC(
+    s1, s0,
     delta_time, BA_comp_intra, BA_comp_inter, Temp, Prec,
     pars[['growth']], pars[['mort']], plot_random
   )
-  F <- h * outer(
-    meshpts, meshpts,
-    ingrowth_lk,
-    delta_time, plotSize, BAplot_intra, BAplot_total, Temp, Prec, pars[['rec']], pars[['sizeIngrowth']], plot_random[3]
+  P <- h * matrix(P_vals, nrow = n, ncol = n)
+
+  F_vals <- ingrowth_lk(
+    s1, s0,
+    delta_time, plotSize, BAplot_intra, BAplot_total, Temp, Prec,
+    pars[['rec']], pars[['sizeIngrowth']], plot_random[3]
   )
+  F <- h * matrix(F_vals, nrow = n, ncol = n)
 
   K <- P + F
 

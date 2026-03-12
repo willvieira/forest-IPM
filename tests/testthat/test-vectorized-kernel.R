@@ -38,8 +38,9 @@ test_that("vectorized P matrix equals outer() result for 3x3 micro-kernel", {
   )
 
   # Vectorized result (rep + direct eval + matrix)
-  s1 <- rep(test_meshpts, each  = n_test)   # outer's X -> P_xEC's 1st arg (size_t1)
-  s0 <- rep(test_meshpts, times = n_test)   # outer's Y -> P_xEC's 2nd arg (size_t0)
+  # outer(X,Y,FUN): X_expanded=rep(X,times=n), Y_expanded=rep(Y,each=n)
+  s1 <- rep(test_meshpts, times = n_test)   # outer's X_expanded -> 1st arg (size_t1)
+  s0 <- rep(test_meshpts, each  = n_test)   # outer's Y_expanded -> 2nd arg (size_t0)
   P_vals <- P_xEC(
     s1, s0,
     1, BA_intra, BA_inter, 10, 1100,
@@ -81,8 +82,9 @@ test_that("vectorized F matrix equals outer() result for 3x3 micro-kernel", {
   )
 
   # Vectorized result
-  s1 <- rep(test_meshpts, each  = n_test)
-  s0 <- rep(test_meshpts, times = n_test)
+  # outer(X,Y,FUN): X_expanded=rep(X,times=n), Y_expanded=rep(Y,each=n)
+  s1 <- rep(test_meshpts, times = n_test)   # outer's X_expanded -> 1st arg (size_t1)
+  s0 <- rep(test_meshpts, each  = n_test)   # outer's Y_expanded -> 2nd arg (size_t0)
   F_vals <- ingrowth_lk(
     s1, s0,
     1, 1000, BAplot_intra, BAplot_total, 10, 1100,
