@@ -85,13 +85,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 ### Phase 5: Create script to compare results between old version of the package and this new versions (specially eigen computation). We can use simulation outputs from simulations folder and compare their results with the same output from our new R package
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Verify that all Phase 02-01 (EigenSolver fix), Phase 06-01 (vectorized kernel), and Phase 06-03 (truncnorm elimination) changes produce lambda values numerically identical (within 1e-10) to the original cluster simulation outputs in final_output.RDS
+**Requirements**: COMPARE-01, COMPARE-02, COMPARE-03
 **Depends on:** Phase 4
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 5 to break down)
+- [ ] 05-01-PLAN.md — Write compare_versions.R: standalone script that loads new package, reproduces ipm_i.R parameter draw sequence, and diffs all 5 lambda metrics against final_output.RDS for ~15 stratified rows
 
 ### Phase 6: Run tests with profvis to check for potential efficiency gains
 
