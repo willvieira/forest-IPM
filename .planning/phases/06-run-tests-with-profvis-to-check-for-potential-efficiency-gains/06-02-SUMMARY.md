@@ -62,7 +62,7 @@ completed: 2026-03-12
 - **Duration:** ~16 min
 - **Started:** 2026-03-12T01:45:15Z
 - **Completed:** 2026-03-12T02:01:33Z
-- **Tasks:** 1 of 2 (Task 2 is checkpoint:human-verify)
+- **Tasks:** 2 of 2 (Task 2 checkpoint completed after human flamegraph review)
 - **Files modified:** 5
 
 ## Accomplishments
@@ -75,6 +75,7 @@ completed: 2026-03-12
 ## Task Commits
 
 1. **Task 1: Write and run profiling script, produce PROFILING.md** - `2874adc` (feat)
+2. **Task 2: Checkpoint — record approved optimization targets in PROFILING.md** - `7d615d0` (docs)
 
 ## Files Created/Modified
 
@@ -112,9 +113,10 @@ completed: 2026-03-12
 
 ## Next Phase Readiness
 
-- Profiling artifacts ready for human review
-- PROFILING.md provides numeric evidence for Plan 03 optimization decisions
-- After human approves optimization targets at checkpoint, Plan 03 can apply: (1) vectorize outer(), (2) replace truncnorm::dtruncnorm with dnorm/pnorm, optionally (3) cache BA metrics
+- Profiling complete and human-reviewed
+- PROFILING.md has numeric evidence and explicit approval for Plan 03 optimization decisions
+- Plan 03 is cleared to apply: (1) vectorize outer() in mkKernel(), (2) replace truncnorm::dtruncnorm with dnorm/pnorm in ingrowth_lk()
+- Target 3 (BA caching) and Target 4 (C++) are deferred — evaluate after Targets 1+2
 
 ## Self-Check: PASSED
 
@@ -122,8 +124,10 @@ completed: 2026-03-12
 - FOUND: `.planning/phases/06-run-tests-with-profvis-to-check-for-potential-efficiency-gains/PROFILING.md` (9.3 KB)
 - FOUND: `.planning/phases/06-run-tests-with-profvis-to-check-for-potential-efficiency-gains/profile_benchmark.R`
 - FOUND commit 2874adc (Task 1)
+- FOUND commit 7d615d0 (Task 2 — Approved Optimizations section in PROFILING.md)
 - No unfilled {placeholders} in PROFILING.md
+- PROFILING.md contains ## Approved Optimizations section with explicit go/no-go for each target
 
 ---
 *Phase: 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains*
-*Completed: 2026-03-12 (Task 1); awaiting human checkpoint for Task 2*
+*Completed: 2026-03-12*
