@@ -138,6 +138,17 @@ _Note: Task 1 used TDD flow: RED (tests skip with missing fixtures) -> fixtures 
 - All R/ source files use idiomatic tidyverse style (native pipe, typed purrr maps, .data$ pronouns)
 - Pre-existing test infrastructure issues documented in deferred-items.md for Phase 06-02 or maintenance work
 
+## Self-Check: PASSED
+
+- FOUND: tests/testthat/test-regression-baselines.R
+- FOUND: tests/testthat/fixtures/lambda_baseline.rds
+- FOUND: tests/testthat/fixtures/project_baseline.rds
+- FOUND: 06-01-SUMMARY.md
+- FOUND commit c81658d (Task 1)
+- FOUND commit 758b05a (Task 2)
+- No %>% in R/ code
+- No sapply/vapply in R/ code
+
 ---
 *Phase: 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains*
 *Completed: 2026-03-12*
