@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md — all tasks done, optimizations approved
-last_updated: "2026-03-12T12:43:45.029Z"
+stopped_at: "Completed 06-03 Tasks 1+2 — awaiting checkpoint:human-verify for Task 3"
+last_updated: "2026-03-12T13:52:38.392Z"
 last_activity: 2026-03-04 — Plan 02-02 executed and verified
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 62
 ---
 
@@ -54,6 +54,7 @@ Progress: [██████░░░░] 62%
 | Phase 02-package-skeleton-and-bug-fixes P03 | 76 | 3 tasks | 21 files |
 | Phase 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains P01 | 85 | 2 tasks | 8 files |
 | Phase 06 P02 | 16 | 1 tasks | 5 files |
+| Phase 06 P03 | 120 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Recent decisions affecting current work:
 - [Phase 06]: F matrix (outer + ingrowth_lk + truncnorm::dtruncnorm) is 2.5x more expensive than P matrix — profiling evidence changes Plan 03 priority order; Targets 1+2 must be co-applied
 - [Phase 06]: truncnorm::dtruncnorm is 46% inclusive hotspot — replace with dnorm/pnorm direct formula in ingrowth_lk (math equivalent, base R vectorizes natively after outer() vectorization)
 - [Phase 06]: Human approved Target 1 (vectorize outer) and Target 2 (replace truncnorm::dtruncnorm with dnorm/pnorm) for Plan 03 implementation; Targets 3 and 4 deferred
+- [Phase 06]: outer() semantics: X_expanded=rep(X,times=n), Y_expanded=rep(Y,each=n); s1=rep(meshpts,times=n) for size_t1, s0=rep(meshpts,each=n) for size_t0 in vectorized mkKernel()
+- [Phase 06]: Target 2 (truncnorm elimination) is the dominant gain source — F matrix 2.4x faster; Target 1 (outer vectorization) alone gives negligible speedup for P matrix
+- [Phase 06]: Remove truncnorm from DESCRIPTION Imports — dependency eliminated now that ingrowth_lk uses dnorm/pnorm; closes PITFALLS.md Pitfall 11
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T12:43:24.043Z
-Stopped at: Completed 06-02-PLAN.md — all tasks done, optimizations approved
+Last session: 2026-03-12T13:52:38.388Z
+Stopped at: Completed 06-03 Tasks 1+2 — awaiting checkpoint:human-verify for Task 3
 Resume file: None
