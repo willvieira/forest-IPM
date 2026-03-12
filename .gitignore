@@ -56,3 +56,6 @@ src/*.dll
 
 # Exceptions: test fixtures must be tracked
 #!tests/testthat/fixtures/*.rds
+# Exceptions: profiling flamegraph artifacts in .planning must be tracked
+!.planning/phases/*/profvis_output.html
+!.planning/phases/*/profvis_multi_output.html
