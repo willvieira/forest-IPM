@@ -98,7 +98,7 @@ Plans:
 **Goal:** Profile the core IPM computation pipeline with profvis, revamp R/ code to consistent tidyverse style, and apply targeted optimizations based on profiling evidence
 **Requirements**: TBD
 **Depends on:** Phase 5
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 06-01-PLAN.md — Capture pre-optimization baselines and apply tidyverse-style revamp to all R/ source files
