@@ -62,7 +62,7 @@ completed: 2026-03-12
 - **Duration:** ~120 min (dominated by 3 regression test runs at ~5 min each)
 - **Started:** 2026-03-12
 - **Completed:** 2026-03-12
-- **Tasks:** 2 of 3 (Task 3 is checkpoint:human-verify — awaiting human approval)
+- **Tasks:** 3 of 3 (complete — human sign-off recorded 2026-03-12)
 - **Files modified:** 5
 
 ## Accomplishments
@@ -83,6 +83,7 @@ Each task was committed atomically:
 3. **[Auto-fix Rule 1] Fix outer() each/times ordering** — discovered during regression test failure; corrected in same commit as `b275819` (fix within task)
 4. **Task 2: Before/after benchmark + PROFILING.md update** - `05df204` (feat)
 5. **[Auto-fix Rule 2] Remove truncnorm from DESCRIPTION** - `c3c3680` (fix)
+6. **Task 3: Human sign-off recorded in PROFILING.md** - `21a9930` (docs)
 
 ## Files Created/Modified
 
@@ -135,7 +136,7 @@ None — no external service configuration required.
 ## Next Phase Readiness
 
 - All regression tests pass (FAIL 0, WARN 0, SKIP 0, PASS 2 for regression; PASS 18 for package-structure)
-- Phase 06 is complete pending human verification of this checkpoint
+- Phase 06 is complete — human sign-off received 2026-03-12
 - 100-year runs now ~54s (down from ~76s), a ~22s saving per run
 - If further speedup desired: Target 3 (BA caching, ~10%) and Target 4 (C++ migration, pending Xcode license) remain available
 
