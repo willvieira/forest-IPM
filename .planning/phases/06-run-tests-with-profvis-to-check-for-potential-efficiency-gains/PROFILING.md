@@ -156,3 +156,29 @@ The plan anticipated that the P matrix (`outer` + `P_xEC`) would be the dominant
 ## Summary Recommendation
 
 Apply **Target 1 (vectorize outer())** and **Target 2 (replace truncnorm::dtruncnorm)** together in Plan 03. These two changes address the 73.8% outer() overhead and the 46% truncnorm hotspot. Since Target 2 depends on having n²-element vector input (which Target 1 provides), they must be implemented together. Combined expected gain: **50–70% reduction** in mkKernel() time, bringing a 100-year single-species run from ~76 seconds to an estimated 23–38 seconds. Target 3 (BA caching) can be applied as a secondary optimization if BA metrics remain visible after Targets 1+2. Target 4 (C++) should be deferred until the Xcode license blocker is resolved.
+
+---
+
+## Approved Optimizations
+
+**Reviewed by:** Human (flamegraph + PROFILING.md review)
+**Date:** 2026-03-12
+
+The following optimization targets have been approved for implementation in Plan 03:
+
+### Approved: Target 1 — Vectorize outer() calls in mkKernel()
+
+- **Evidence basis:** `outer()` accounts for 73.8% of total runtime; n² R function dispatch calls (4,995,225 per timestep) are the primary overhead
+- **Implementation:** Replace `outer(meshpts, meshpts, FUN, ...)` pattern with `rep()`/vectorized evaluation + `matrix()` in `R/kernel.R`
+- **Approved scope:** Both P matrix (`outer` + `P_xEC`) and F matrix (`outer` + `ingrowth_lk`) outer calls
+
+### Approved: Target 2 — Replace truncnorm::dtruncnorm with dnorm/pnorm
+
+- **Evidence basis:** `truncnorm::dtruncnorm` is the single largest leaf hotspot at 46% inclusive runtime; it is called once per matrix cell (~5M times per timestep)
+- **Implementation:** Replace `truncnorm::dtruncnorm(x, a=127, b=Inf, mean=mu, sd=sig)` with `dnorm(x, mean=mu, sd=sig) / (1 - pnorm(127, mean=mu, sd=sig))` in `ingrowth_lk()` in `R/kernel.R`
+- **Note:** Target 2 compounds with Target 1 — both must be co-applied; the gain from Target 2 depends on receiving n²-element vector input enabled by Target 1 vectorization
+
+### Not approved for Plan 03:
+
+- **Target 3 (BA caching):** Deferred — evaluate residual profile after Targets 1+2 to determine if BA metrics (~10%) remain significant enough to warrant the implementation complexity
+- **Target 4 (C++ migration):** Deferred — Xcode license blocker (see STATE.md) must be resolved first; also likely unnecessary if Targets 1+2 achieve 50–70% reduction
