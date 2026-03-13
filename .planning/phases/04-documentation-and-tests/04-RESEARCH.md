@@ -136,7 +136,7 @@ book_forest-demography-IPM/
 #' @examples
 #' df <- data.frame(size_mm = c(150, 200, 350),
 #'                  species_id = "ABIBAL",
-#'                  plot_size = 1000)
+#'                  plot_size = 400)
 #' s   <- stand(df)
 #' mod <- species_model(s)
 #' p   <- parameters(mod, draw = "mean")
@@ -281,7 +281,7 @@ pars <- parameters(mod, draw = "mean")
 ### Full Workflow for @examples (fast, offline)
 ```r
 s    <- stand(data.frame(size_mm = c(150, 200, 350),
-                          species_id = "ABIBAL", plot_size = 1000))
+                          species_id = "ABIBAL", plot_size = 400))
 mod  <- species_model(s)
 pars <- parameters(mod, draw = "mean")
 env  <- env_condition(MAT = 8, MAP = 1200)
