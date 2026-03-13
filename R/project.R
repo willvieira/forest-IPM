@@ -215,7 +215,7 @@ summary.ipm_projection <- function(object, ...) {
 #' proj <- project(mod, pars, s, env, ctrl)
 #' plot(proj, type = "lambda")
 plot.ipm_projection <- function(x, type = NULL, ...) {
-  types <- c("lambda", "size_dist", "lambda_vs_n")
+  types <- c("lambda", "pop_size", "size_dist", "lambda_vs_n")
   if (!is.null(type) && !type %in% types) {
     cli::cli_abort(
       "{.arg type} must be one of {.val {types}} or NULL. Got {.val {type}}."
@@ -225,6 +225,7 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
   for (t in to_plot) {
     switch(t,
       lambda      = .plot_lambda(x, ...),
+      pop_size    = .plot_pop_size(x, ...),
       size_dist   = .plot_size_dist(x, ...),
       lambda_vs_n = .plot_lambda_vs_n(x, ...)
     )
@@ -233,37 +234,52 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
 }
 
 .plot_lambda <- function(x, ...) {
-  sp_list <- x$species
-  n_sp    <- length(sp_list)
+  sps_id <- supported_species()
+  x$summary |>
+    left_join(
+      sps_id[, c("species_id", "species_name")],
+      by = c("species_id" = "species_id")
+    ) |>
+    ggplot() +
+    aes(timestep, lambda, color = species_name) +
+    geom_line() +
+    geom_hline(yintercept = 1, linetype = 2, alpha = 0.4) +
+    theme_classic() +
+    labs(
+      x = "Time",
+      y = expression(lambda),
+      color = "Species"
+    ) +
+    theme(
+      strip.background = element_blank(),
+      legend.text = element_text(face = "italic")
+    )
 
-  # Check if all lambda values are NA
-  all_na <- all(vapply(x$lambda, function(l) all(is.na(l)), logical(1)))
-  if (all_na) {
-    message("Lambda not computed. Use control(compute_lambda = TRUE).")
-    return(invisible(NULL))
-  }
+  invisible(NULL)
+}
 
-  cols <- if (n_sp <= 8) c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3",
-                           "#ff7f00", "#a65628", "#f781bf", "#999999") else
-          grDevices::rainbow(n_sp)
+.plot_pop_size <- function(x, ...) {
+  sps_id <- supported_species()
+  x$summary |>
+    left_join(
+      sps_id[, c("species_id", "species_name")],
+      by = c("species_id" = "species_id")
+    ) |>
+    ggplot() +
+    aes(timestep, n_trees, color = species_name) +
+    geom_line() +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.4) +
+    theme_classic() +
+    labs(
+      x = "Time",
+      y = "N (population size)",
+      color = "Species"
+    ) +
+    theme(
+      strip.background = element_blank(),
+      legend.text = element_text(face = "italic")
+    )
 
-  for (i in seq_along(sp_list)) {
-    sp  <- sp_list[[i]]
-    lam <- x$lambda[[sp]]
-    yrs <- seq_along(lam)
-    if (i == 1) {
-      plot(yrs, lam, type = "l", col = cols[i], lwd = 2,
-           xlab = "Year", ylab = "Lambda", main = "Lambda over time", ...)
-    } else {
-      graphics::lines(yrs, lam, col = cols[i], lwd = 2)
-    }
-  }
-
-  graphics::abline(h = 1, lty = 2, col = "grey50")
-  if (n_sp > 1) {
-    graphics::legend("topright", legend = sp_list,
-                     col = cols[seq_along(sp_list)], lwd = 2, bty = "n")
-  }
   invisible(NULL)
 }
 
@@ -272,55 +288,44 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
     message("No population data available.")
     return(invisible(NULL))
   }
+  sps_id <- supported_species()
+  x$stand_series[[length(x$stand_series)]]$distributions |>
+    bind_rows(.id = "species_id") |>
+    left_join(
+      sps_id[, c("species_id", "species_name")],
+      by = c("species_id" = "species_id")
+    ) |>
+    ggplot() +
+    aes(size_mm, density, color = species_name) +
+    geom_point(alpha = 0.5) +
+    geom_path() +
+    theme_classic() +
+    labs(
+      x = "size DBH (mm)",
+      color = "Species"
+    ) +
+    theme(
+      strip.background = element_blank(),
+      legend.text = element_text(face = "italic")
+    )
 
-  sp_list <- x$species
-  last_snap <- x$stand_series[[length(x$stand_series)]]
-
-  for (sp in sp_list) {
-    dist_df <- last_snap$distributions[[sp]]
-    if (is.null(dist_df) || nrow(dist_df) == 0) next
-
-    # Aggregate density by binned size class for barplot display
-    breaks <- seq(min(dist_df$size_mm), max(dist_df$size_mm),
-                  length.out = min(30L, nrow(dist_df)))
-    bins    <- cut(dist_df$size_mm, breaks = breaks, include.lowest = TRUE)
-    agg     <- tapply(dist_df$density, bins, mean, na.rm = TRUE)
-    agg[is.na(agg)] <- 0
-
-    graphics::barplot(agg,
-      main = paste("Size distribution:", sp),
-      xlab = "Size class",
-      ylab = "Density",
-      names.arg = rep("", length(agg)))
-  }
   invisible(NULL)
 }
 
 .plot_lambda_vs_n <- function(x, ...) {
-  if (is.null(x$stand_series) || length(x$stand_series) == 0) {
-    return(invisible(NULL))
-  }
+  sps_id <- supported_species()
+  x$summary |>
+    left_join(
+      sps_id[, c("species_id", "species_name")],
+      by = c("species_id" = "species_id")
+    ) |>
+    ggplot() +
+    aes(n_trees, lambda) +
+    aes(color = species_name) +
+    geom_path() +
+    theme_classic() +
+    labs(x = 'Population size', y = expression(lambda)) +
+    geom_hline(yintercept = 1, alpha = 0.2)
 
-  sp_list <- x$species
-  smry    <- x$summary
-
-  for (sp in sp_list) {
-    sp_rows <- smry[smry$species_id == sp, ]
-    if (nrow(sp_rows) == 0) next
-
-    total_n <- sp_rows$n_trees
-    lam     <- sp_rows$lambda
-
-    if (all(is.na(lam))) {
-      message(paste("Lambda not computed for", sp, ". Skipping lambda_vs_n plot."))
-      next
-    }
-
-    plot(total_n, lam,
-         xlab = "Total N",
-         ylab = "Lambda",
-         main = paste("Lambda vs N:", sp), ...)
-    graphics::abline(h = 1, lty = 2)
-  }
   invisible(NULL)
 }
