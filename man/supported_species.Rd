@@ -13,3 +13,7 @@ growth_model, surv_model, recruit_model. One row per supported species.
 \description{
 Return the tibble of species supported by forestIPM
 }
+\examples{
+sp <- supported_species()
+head(sp)
+}

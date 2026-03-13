@@ -14,6 +14,8 @@
 #' @param MAP Numeric. Mean annual precipitation in mm/year.
 #' @return A named list with elements \code{MAT} and \code{MAP}, each scaled
 #'   to [0, 1].
+#' @examples
+#' scaled <- scale_env(MAT = 8, MAP = 1200)
 #' @export
 scale_env <- function(MAT, MAP) {
   rng <- .env_ranges()
@@ -32,6 +34,9 @@ scale_env <- function(MAT, MAP) {
 #' @param MAP Numeric. Scaled mean annual precipitation in [0, 1].
 #' @return A named list with elements \code{MAT} (degrees Celsius) and
 #'   \code{MAP} (mm/year).
+#' @examples
+#' scaled   <- scale_env(MAT = 8, MAP = 1200)
+#' original <- unscale_env(scaled$MAT, scaled$MAP)
 #' @export
 unscale_env <- function(MAT, MAP) {
   rng <- .env_ranges()

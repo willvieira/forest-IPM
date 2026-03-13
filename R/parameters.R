@@ -43,6 +43,14 @@ validate_ipm_parameters <- function(x) {
 #'   \code{seed = NULL}, a seed is auto-generated so the draw is reproducible.
 #'   Retrieve it from \code{$seed} on the returned object.
 #' @return An object of S3 class \code{"ipm_parameters"}.
+#' @examples
+#' df <- data.frame(size_mm = c(150, 200, 350),
+#'                  species_id = "ABIBAL",
+#'                  plot_size  = 1000)
+#' s    <- stand(df)
+#' mod  <- species_model(s)
+#' pars <- parameters(mod, draw = "mean")
+#' print(pars)
 #' @export
 parameters <- function(mod, draw = "random", seed = NULL) {
   if (!inherits(mod, "ipm_spModel")) {
@@ -117,6 +125,14 @@ parameters <- function(mod, draw = "random", seed = NULL) {
 #'   is a numeric vector; ignored when \code{values} is a named list.
 #'   If \code{NULL} and \code{values} is a numeric vector, applies to all species.
 #' @return The modified \code{ipm_parameters} object.
+#' @examples
+#' df <- data.frame(size_mm = c(150, 200, 350),
+#'                  species_id = "ABIBAL",
+#'                  plot_size  = 1000)
+#' s     <- stand(df)
+#' mod   <- species_model(s)
+#' pars  <- parameters(mod, draw = "mean")
+#' pars2 <- set_random_effects(pars, values = c(0, 0, 0))
 #' @export
 set_random_effects <- function(pars, values, species = NULL) {
   if (!inherits(pars, "ipm_parameters")) {

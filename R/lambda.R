@@ -12,6 +12,17 @@
 #'   \code{delta_time} are used. If NULL, defaults are used.
 #' @return An object of S3 class \code{"ipm_lambda"} — a named numeric vector
 #'   with one element per focal species (species with available parameters).
+#' @examples
+#' df <- data.frame(size_mm = c(150, 200, 350),
+#'                  species_id = "ABIBAL",
+#'                  plot_size  = 1000)
+#' s    <- stand(df)
+#' mod  <- species_model(s)
+#' pars <- parameters(mod, draw = "mean")
+#' env  <- env_condition(MAT = 8, MAP = 1200)
+#' ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
+#' lam  <- lambda(mod, pars, s, env, ctrl)
+#' print(lam)
 #' @export
 lambda <- function(mod, pars, stand, env, ctrl = NULL) {
   if (!inherits(mod,   "ipm_spModel"))    cli::cli_abort("{.arg mod} must be {.cls ipm_spModel}.")

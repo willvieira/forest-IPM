@@ -41,6 +41,9 @@ validate_ipm_env <- function(x) {
 #'   mm/year.
 #' @return An object of S3 class \code{"ipm_env"} with fields \code{$MAT} and
 #'   \code{$MAP} (unscaled; internal scaling applied by engines).
+#' @examples
+#' env <- env_condition(MAT = 8, MAP = 1200)
+#' print(env)
 #' @export
 env_condition <- function(MAT, MAP) {
   validate_ipm_env(new_ipm_env(MAT = MAT, MAP = MAP))

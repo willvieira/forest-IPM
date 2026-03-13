@@ -20,3 +20,11 @@ An object of S3 class \code{"ipm_spModel"} with fields
 \description{
 Create an ipm_spModel object defining which species to model
 }
+\examples{
+df <- data.frame(size_mm = c(150, 200, 350),
+                 species_id = "ABIBAL",
+                 plot_size  = 1000)
+s   <- stand(df)
+mod <- species_model(s)
+print(mod)
+}

@@ -56,6 +56,12 @@ validate_ipm_stand <- function(x) {
 #'   (data.frame with standardized columns \code{size_mm} and \code{species_id}),
 #'   \code{$species} (character vector of unique species IDs), and
 #'   \code{$plot_size} (numeric scalar).
+#' @examples
+#' df <- data.frame(size_mm = c(150, 200, 350),
+#'                  species_id = "ABIBAL",
+#'                  plot_size  = 1000)
+#' s <- stand(df)
+#' print(s)
 #' @export
 stand <- function(data) {
   data <- as.data.frame(data)

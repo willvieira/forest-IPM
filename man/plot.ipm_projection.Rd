@@ -2,17 +2,33 @@
 % Please edit documentation in R/project.R
 \name{plot.ipm_projection}
 \alias{plot.ipm_projection}
-\title{Plot lambda trajectory from an IPM projection}
+\title{Plot an ipm_projection object}
 \usage{
-\method{plot}{ipm_projection}(x, y, ...)
+\method{plot}{ipm_projection}(x, type = NULL, ...)
 }
 \arguments{
-\item{x}{An \code{ipm_projection} object.}
+\item{x}{An \code{ipm_projection} object returned by \code{\link{project}}.}
 
-\item{y}{Ignored.}
+\item{type}{Character or NULL. One of \code{"lambda"}, \code{"size_dist"},
+\code{"lambda_vs_n"}. If NULL (default), all three figures are rendered
+in sequence.}
 
-\item{...}{Additional arguments passed to \code{plot()}.}
+\item{...}{Additional arguments (currently unused).}
+}
+\value{
+\code{x}, invisibly.
 }
 \description{
-Plot lambda trajectory from an IPM projection
+Plot an ipm_projection object
+}
+\examples{
+df <- data.frame(size_mm = seq(130, 600, by = 50),
+                 species_id = "ABIBAL", plot_size = 400)
+s    <- stand(df)
+mod  <- species_model(s)
+pars <- parameters(mod, draw = "mean")
+env  <- env_condition(MAT = 8, MAP = 1200)
+ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
+proj <- project(mod, pars, s, env, ctrl)
+plot(proj, type = "lambda")
 }

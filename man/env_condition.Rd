@@ -20,3 +20,7 @@ An object of S3 class \code{"ipm_env"} with fields \code{$MAT} and
 \description{
 Create an ipm_env object specifying climate drivers
 }
+\examples{
+env <- env_condition(MAT = 8, MAP = 1200)
+print(env)
+}

@@ -22,3 +22,12 @@ An object of S3 class \code{"ipm_parameters"}.
 \description{
 Resolve a single parameter realization from Bayesian posteriors
 }
+\examples{
+df <- data.frame(size_mm = c(150, 200, 350),
+                 species_id = "ABIBAL",
+                 plot_size  = 1000)
+s    <- stand(df)
+mod  <- species_model(s)
+pars <- parameters(mod, draw = "mean")
+print(pars)
+}

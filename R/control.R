@@ -58,6 +58,9 @@ validate_ipm_control <- function(x) {
 #' @param progress Logical. Whether to display a progress bar during projection.
 #'   Default TRUE.
 #' @return An object of S3 class \code{"ipm_control"}.
+#' @examples
+#' ctrl <- control(years = 10, compute_lambda = TRUE, progress = FALSE)
+#' print(ctrl)
 #' @export
 control <- function(years = 100, delta_time = 1, store_every = 1, bin_width = 1,
                     compute_lambda = FALSE, progress = TRUE) {

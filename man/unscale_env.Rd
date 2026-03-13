@@ -19,3 +19,7 @@ A named list with elements \code{MAT} (degrees Celsius) and
 Reverses the scaling applied by \code{scale_env()}, converting scaled values
 back to degrees Celsius and mm/year.
 }
+\examples{
+scaled   <- scale_env(MAT = 8, MAP = 1200)
+original <- unscale_env(scaled$MAT, scaled$MAP)
+}

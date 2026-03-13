@@ -41,6 +41,13 @@ validate_ipm_spModel <- function(x, on_missing) {
 #'   \code{"drop"}, or \code{"static"}.
 #' @return An object of S3 class \code{"ipm_spModel"} with fields
 #'   \code{$species}, \code{$params}, and \code{$on_missing}.
+#' @examples
+#' df <- data.frame(size_mm = c(150, 200, 350),
+#'                  species_id = "ABIBAL",
+#'                  plot_size  = 1000)
+#' s   <- stand(df)
+#' mod <- species_model(s)
+#' print(mod)
 #' @export
 species_model <- function(x, on_missing = "error") {
   # Resolve species IDs from stand or character vector

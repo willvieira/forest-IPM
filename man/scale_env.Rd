@@ -20,3 +20,6 @@ Scales mean annual temperature and precipitation to the \link{0, 1} range using
 the observed ranges stored in the package. These scaled values are what the
 IPM vital rate functions expect internally.
 }
+\examples{
+scaled <- scale_env(MAT = 8, MAP = 1200)
+}

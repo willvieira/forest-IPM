@@ -25,3 +25,12 @@ Populates the \code{$random_effects} slot inside each species entry of an
 \code{ipm_parameters} object. Engines (\code{lambda()}, \code{project()})
 default to \code{c(0, 0, 0)} for any species whose slot is \code{NULL}.
 }
+\examples{
+df <- data.frame(size_mm = c(150, 200, 350),
+                 species_id = "ABIBAL",
+                 plot_size  = 1000)
+s     <- stand(df)
+mod   <- species_model(s)
+pars  <- parameters(mod, draw = "mean")
+pars2 <- set_random_effects(pars, values = c(0, 0, 0))
+}

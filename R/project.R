@@ -9,6 +9,17 @@
 #'   \code{$species}, \code{$years}, \code{$lambda}, \code{$stand_series}
 #'   (list of \code{ipm_dist_snapshot} objects, each holding the continuous
 #'   size distribution per species at that timestep), \code{$summary}.
+#' @examples
+#' df <- data.frame(size_mm = c(150, 200, 350),
+#'                  species_id = "ABIBAL",
+#'                  plot_size  = 1000)
+#' s    <- stand(df)
+#' mod  <- species_model(s)
+#' pars <- parameters(mod, draw = "mean")
+#' env  <- env_condition(MAT = 8, MAP = 1200)
+#' ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
+#' proj <- project(mod, pars, s, env, ctrl)
+#' print(proj)
 #' @export
 project <- function(mod, pars, stand, env, ctrl) {
   if (!inherits(mod,   "ipm_spModel"))    cli::cli_abort("{.arg mod} must be {.cls ipm_spModel}.")

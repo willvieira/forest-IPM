@@ -26,3 +26,15 @@ size distribution per species at that timestep), \code{$summary}.
 \description{
 Project population dynamics over time
 }
+\examples{
+df <- data.frame(size_mm = c(150, 200, 350),
+                 species_id = "ABIBAL",
+                 plot_size  = 1000)
+s    <- stand(df)
+mod  <- species_model(s)
+pars <- parameters(mod, draw = "mean")
+env  <- env_condition(MAT = 8, MAP = 1200)
+ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
+proj <- project(mod, pars, s, env, ctrl)
+print(proj)
+}

@@ -35,3 +35,7 @@ An object of S3 class \code{"ipm_control"}.
 \description{
 Configure IPM projection settings
 }
+\examples{
+ctrl <- control(years = 10, compute_lambda = TRUE, progress = FALSE)
+print(ctrl)
+}

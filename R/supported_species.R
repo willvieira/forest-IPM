@@ -2,6 +2,9 @@
 #'
 #' @return A tibble with six columns: species_id, common_name, nom_commun,
 #'   growth_model, surv_model, recruit_model. One row per supported species.
+#' @examples
+#' sp <- supported_species()
+#' head(sp)
 #' @export
 supported_species <- function() {
   path <- system.file("extdata", "species_list.csv", package = "forestIPM")

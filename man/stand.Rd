@@ -19,3 +19,10 @@ An object of S3 class \code{"ipm_stand"} with fields \code{$trees}
 \description{
 Create an ipm_stand object representing a forest plot
 }
+\examples{
+df <- data.frame(size_mm = c(150, 200, 350),
+                 species_id = "ABIBAL",
+                 plot_size  = 1000)
+s <- stand(df)
+print(s)
+}
