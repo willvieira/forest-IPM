@@ -198,9 +198,12 @@ summary.ipm_projection <- function(object, ...) {
 #' Plot an ipm_projection object
 #'
 #' @param x An \code{ipm_projection} object returned by \code{\link{project}}.
-#' @param type Character or NULL. One of \code{"lambda"}, \code{"size_dist"},
-#'   \code{"lambda_vs_n"}. If NULL (default), all three figures are rendered
-#'   in sequence.
+#' @param type Character or NULL. One of \code{"lambda"}, \code{"pop_size"},
+#'   \code{"size_dist"}, \code{"lambda_vs_n"}. If NULL (default), all four
+#'   figures are rendered in sequence.
+#' @param timestep Integer or NULL. Only used when \code{type = "size_dist"}.
+#'   The stored timestep (year) to plot. If NULL (default), the last stored
+#'   timestep is used. Must be one of the values in \code{x$years}.
 #' @param ... Additional arguments (currently unused).
 #' @return \code{x}, invisibly.
 #' @export
@@ -214,7 +217,8 @@ summary.ipm_projection <- function(object, ...) {
 #' ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
 #' proj <- project(mod, pars, s, env, ctrl)
 #' plot(proj, type = "lambda")
-plot.ipm_projection <- function(x, type = NULL, ...) {
+#' plot(proj, type = "size_dist", timestep = 3)
+plot.ipm_projection <- function(x, type = NULL, timestep = NULL, ...) {
   types <- c("lambda", "pop_size", "size_dist", "lambda_vs_n")
   if (!is.null(type) && !type %in% types) {
     cli::cli_abort(
@@ -226,7 +230,7 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
     switch(t,
       lambda      = .plot_lambda(x, ...),
       pop_size    = .plot_pop_size(x, ...),
-      size_dist   = .plot_size_dist(x, ...),
+      size_dist   = .plot_size_dist(x, timestep = timestep, ...),
       lambda_vs_n = .plot_lambda_vs_n(x, ...)
     )
   }
@@ -235,7 +239,7 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
 
 .plot_lambda <- function(x, ...) {
   sps_id <- supported_species()
-  x$summary |>
+  p <- x$summary |>
     left_join(
       sps_id[, c("species_id", "species_name")],
       by = c("species_id" = "species_id")
@@ -254,13 +258,13 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
       strip.background = element_blank(),
       legend.text = element_text(face = "italic")
     )
-
+  print(p)
   invisible(NULL)
 }
 
 .plot_pop_size <- function(x, ...) {
   sps_id <- supported_species()
-  x$summary |>
+  p <- x$summary |>
     left_join(
       sps_id[, c("species_id", "species_name")],
       by = c("species_id" = "species_id")
@@ -279,17 +283,30 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
       strip.background = element_blank(),
       legend.text = element_text(face = "italic")
     )
-
+  print(p)
   invisible(NULL)
 }
 
-.plot_size_dist <- function(x, ...) {
+.plot_size_dist <- function(x, timestep = NULL, ...) {
   if (is.null(x$stand_series) || length(x$stand_series) == 0) {
     message("No population data available.")
     return(invisible(NULL))
   }
+  if (is.null(timestep)) {
+    idx     <- length(x$stand_series)
+    t_label <- x$years[idx]
+  } else {
+    idx <- match(timestep, x$years)
+    if (is.na(idx)) {
+      cli::cli_abort(c(
+        "{.arg timestep} {.val {timestep}} was not stored.",
+        "i" = "Available timesteps: {.val {x$years}}."
+      ))
+    }
+    t_label <- timestep
+  }
   sps_id <- supported_species()
-  x$stand_series[[length(x$stand_series)]]$distributions |>
+  p <- x$stand_series[[idx]]$distributions |>
     bind_rows(.id = "species_id") |>
     left_join(
       sps_id[, c("species_id", "species_name")],
@@ -301,6 +318,7 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
     geom_path() +
     theme_classic() +
     labs(
+      title = paste("Size distribution at year", t_label),
       x = "size DBH (mm)",
       color = "Species"
     ) +
@@ -308,13 +326,13 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
       strip.background = element_blank(),
       legend.text = element_text(face = "italic")
     )
-
+  print(p)
   invisible(NULL)
 }
 
 .plot_lambda_vs_n <- function(x, ...) {
   sps_id <- supported_species()
-  x$summary |>
+  p <- x$summary |>
     left_join(
       sps_id[, c("species_id", "species_name")],
       by = c("species_id" = "species_id")
@@ -326,6 +344,6 @@ plot.ipm_projection <- function(x, type = NULL, ...) {
     theme_classic() +
     labs(x = 'Population size', y = expression(lambda)) +
     geom_hline(yintercept = 1, alpha = 0.2)
-
+  print(p)
   invisible(NULL)
 }

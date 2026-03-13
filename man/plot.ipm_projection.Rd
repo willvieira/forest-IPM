@@ -4,14 +4,18 @@
 \alias{plot.ipm_projection}
 \title{Plot an ipm_projection object}
 \usage{
-\method{plot}{ipm_projection}(x, type = NULL, ...)
+\method{plot}{ipm_projection}(x, type = NULL, timestep = NULL, ...)
 }
 \arguments{
 \item{x}{An \code{ipm_projection} object returned by \code{\link{project}}.}
 
-\item{type}{Character or NULL. One of \code{"lambda"}, \code{"size_dist"},
-\code{"lambda_vs_n"}. If NULL (default), all three figures are rendered
-in sequence.}
+\item{type}{Character or NULL. One of \code{"lambda"}, \code{"pop_size"},
+\code{"size_dist"}, \code{"lambda_vs_n"}. If NULL (default), all four
+figures are rendered in sequence.}
+
+\item{timestep}{Integer or NULL. Only used when \code{type = "size_dist"}.
+The stored timestep (year) to plot. If NULL (default), the last stored
+timestep is used. Must be one of the values in \code{x$years}.}
 
 \item{...}{Additional arguments (currently unused).}
 }
@@ -31,4 +35,5 @@ env  <- env_condition(MAT = 8, MAP = 1200)
 ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
 proj <- project(mod, pars, s, env, ctrl)
 plot(proj, type = "lambda")
+plot(proj, type = "size_dist", timestep = 3)
 }

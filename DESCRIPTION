@@ -20,7 +20,8 @@ Imports:
     stringdist (>= 0.9.10),
     rlang (>= 1.1.4),
     magrittr (>= 2.0.3),
-    tibble (>= 3.2.1)
+    tibble (>= 3.2.1),
+    ggplot2 (>= 3.4.0)
 LinkingTo:
     Rcpp,
     RcppEigen
