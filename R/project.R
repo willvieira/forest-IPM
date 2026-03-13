@@ -184,41 +184,132 @@ summary.ipm_projection <- function(object, ...) {
   invisible(object)
 }
 
-#' Plot lambda trajectory from an IPM projection
+#' Plot an ipm_projection object
 #'
-#' @param x An \code{ipm_projection} object.
-#' @param y Ignored.
-#' @param ... Additional arguments passed to \code{plot()}.
+#' @param x An \code{ipm_projection} object returned by \code{\link{project}}.
+#' @param type Character or NULL. One of \code{"lambda"}, \code{"size_dist"},
+#'   \code{"lambda_vs_n"}. If NULL (default), all three figures are rendered
+#'   in sequence.
+#' @param ... Additional arguments (currently unused).
+#' @return \code{x}, invisibly.
 #' @export
-plot.ipm_projection <- function(x, y, ...) {
-  if (all(purrr::map_lgl(x$lambda, function(l) all(is.na(l))))) {
-    message("No lambda values to plot (compute_lambda = FALSE in ctrl).")
-    return(invisible(x))
+#' @examples
+#' df <- data.frame(size_mm = seq(130, 600, by = 50),
+#'                  species_id = "ABIBAL", plot_size = 400)
+#' s    <- stand(df)
+#' mod  <- species_model(s)
+#' pars <- parameters(mod, draw = "mean")
+#' env  <- env_condition(MAT = 8, MAP = 1200)
+#' ctrl <- control(years = 5, compute_lambda = TRUE, progress = FALSE)
+#' proj <- project(mod, pars, s, env, ctrl)
+#' plot(proj, type = "lambda")
+plot.ipm_projection <- function(x, type = NULL, ...) {
+  types <- c("lambda", "size_dist", "lambda_vs_n")
+  if (!is.null(type) && !type %in% types) {
+    cli::cli_abort(
+      "{.arg type} must be one of {.val {types}} or NULL. Got {.val {type}}."
+    )
   }
+  to_plot <- if (is.null(type)) types else type
+  for (t in to_plot) {
+    switch(t,
+      lambda      = .plot_lambda(x, ...),
+      size_dist   = .plot_size_dist(x, ...),
+      lambda_vs_n = .plot_lambda_vs_n(x, ...)
+    )
+  }
+  invisible(x)
+}
 
+.plot_lambda <- function(x, ...) {
   sp_list <- x$species
   n_sp    <- length(sp_list)
 
-  all_lambdas <- unlist(x$lambda)
-  ylim <- range(all_lambdas, na.rm = TRUE)
-  xlim <- range(x$years)
+  # Check if all lambda values are NA
+  all_na <- all(vapply(x$lambda, function(l) all(is.na(l)), logical(1)))
+  if (all_na) {
+    message("Lambda not computed. Use control(compute_lambda = TRUE).")
+    return(invisible(NULL))
+  }
 
-  plot(xlim, ylim, type = "n",
-       xlab = "Timestep (years)", ylab = "Lambda",
-       main = "Population growth rate over time", ...)
-
-  cols <- if (n_sp <= 8) c("#e41a1c","#377eb8","#4daf4a","#984ea3",
-                           "#ff7f00","#a65628","#f781bf","#999999") else
+  cols <- if (n_sp <= 8) c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3",
+                           "#ff7f00", "#a65628", "#f781bf", "#999999") else
           grDevices::rainbow(n_sp)
 
   for (i in seq_along(sp_list)) {
     sp  <- sp_list[[i]]
     lam <- x$lambda[[sp]]
-    graphics::lines(x$years, lam, col = cols[i], lwd = 2)
+    yrs <- seq_along(lam)
+    if (i == 1) {
+      plot(yrs, lam, type = "l", col = cols[i], lwd = 2,
+           xlab = "Year", ylab = "Lambda", main = "Lambda over time", ...)
+    } else {
+      graphics::lines(yrs, lam, col = cols[i], lwd = 2)
+    }
   }
 
   graphics::abline(h = 1, lty = 2, col = "grey50")
-  graphics::legend("topright", legend = sp_list, col = cols[seq_along(sp_list)],
-                   lwd = 2, bty = "n")
-  invisible(x)
+  if (n_sp > 1) {
+    graphics::legend("topright", legend = sp_list,
+                     col = cols[seq_along(sp_list)], lwd = 2, bty = "n")
+  }
+  invisible(NULL)
+}
+
+.plot_size_dist <- function(x, ...) {
+  if (is.null(x$stand_series) || length(x$stand_series) == 0) {
+    message("No population data available.")
+    return(invisible(NULL))
+  }
+
+  sp_list <- x$species
+  last_snap <- x$stand_series[[length(x$stand_series)]]
+
+  for (sp in sp_list) {
+    dist_df <- last_snap$distributions[[sp]]
+    if (is.null(dist_df) || nrow(dist_df) == 0) next
+
+    # Aggregate density by binned size class for barplot display
+    breaks <- seq(min(dist_df$size_mm), max(dist_df$size_mm),
+                  length.out = min(30L, nrow(dist_df)))
+    bins    <- cut(dist_df$size_mm, breaks = breaks, include.lowest = TRUE)
+    agg     <- tapply(dist_df$density, bins, mean, na.rm = TRUE)
+    agg[is.na(agg)] <- 0
+
+    graphics::barplot(agg,
+      main = paste("Size distribution:", sp),
+      xlab = "Size class",
+      ylab = "Density",
+      names.arg = rep("", length(agg)))
+  }
+  invisible(NULL)
+}
+
+.plot_lambda_vs_n <- function(x, ...) {
+  if (is.null(x$stand_series) || length(x$stand_series) == 0) {
+    return(invisible(NULL))
+  }
+
+  sp_list <- x$species
+  smry    <- x$summary
+
+  for (sp in sp_list) {
+    sp_rows <- smry[smry$species_id == sp, ]
+    if (nrow(sp_rows) == 0) next
+
+    total_n <- sp_rows$n_trees
+    lam     <- sp_rows$lambda
+
+    if (all(is.na(lam))) {
+      message(paste("Lambda not computed for", sp, ". Skipping lambda_vs_n plot."))
+      next
+    }
+
+    plot(total_n, lam,
+         xlab = "Total N",
+         ylab = "Lambda",
+         main = paste("Lambda vs N:", sp), ...)
+    graphics::abline(h = 1, lty = 2)
+  }
+  invisible(NULL)
 }
