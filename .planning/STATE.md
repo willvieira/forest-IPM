@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-13T13:55:25.146Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-13T15:38:21.145Z"
 last_activity: 2026-03-13 — Plan 05-01 executed and human-verified
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 9
   percent: 75
 ---
 
@@ -56,6 +56,7 @@ Progress: [████████░░] 75%
 | Phase 06 P02 | 16 | 1 tasks | 5 files |
 | Phase 06 P03 | 120 | 2 tasks | 6 files |
 | Phase 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains P03 | 525548 | 3 tasks | 6 files |
+| Phase 04 P01 | 15 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Recent decisions affecting current work:
 - [Phase 05-01]: copy ref_output$par.BA_het for NULL-het rows to avoid NaN tolerance comparison (denominator is 0 when N_het_pertb = N_het = empty distribution)
 - [Phase 05-01]: pars_to_list() native pipe incompatibility with .[[]] placeholder — fixed by intermediate variable assignment after group_split()
 - [Phase 05-01]: All three key changes (RcppEigen solver, vectorized mkKernel, dnorm/pnorm ingrowth) confirmed numerically identical to cluster reference at 1e-10 — 15/15 stratified rows PASS
+- [Phase 04-01]: plot.ipm_projection type=NULL renders all three panels using existing ipm_projection fields (lambda list, stand_series, summary tibble)
+- [Phase 04-01]: Three obsolete test files deleted: pkgload::pkg_path() at top-level scope causes R CMD check failures; coverage superseded by workflow tests
+- [Phase 04-01]: test-workflow.R adapts assertions to real API: s$trees not s$data, lam[[sp]] not lam$lambda[[sp]], proj$stand_series not proj$pop
 
 ### Pending Todos
 
@@ -117,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T13:55:25.141Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-documentation-and-tests/04-CONTEXT.md
+Last session: 2026-03-13T15:38:21.141Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None

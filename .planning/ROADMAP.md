@@ -69,7 +69,7 @@ Plans:
   1. `?get_params` and `?mkKernel` (and all other exported functions) open a help page with `@param`, `@return`, and `@examples` sections
   2. `devtools::run_examples()` completes without errors or warnings — all examples use the bundled mini-dataset, not live network calls
   3. `devtools::test()` passes with zero failures on a machine with no internet access
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 04-01-PLAN.md — Redesign plot.ipm_projection() (three-panel type dispatch) and establish test infrastructure (delete obsolete tests, write test-workflow.R)
@@ -86,7 +86,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. API Design | 1/1 | Complete | 2026-03-03 |
 | 2. Package Skeleton and Bug Fixes | 3/3 | Complete | 2026-03-04 |
 | 3. Remote Data Layer | 0/TBD | Not started | - |
-| 4. Documentation and Tests | 0/TBD | Not started | - |
+| 4. Documentation and Tests | 1/3 | In Progress|  |
 | 5. Compare Old vs New Package Results | 1/1 | Complete | 2026-03-13 |
 
 ### Phase 5: Create script to compare results between old version of the package and this new versions (specially eigen computation). We can use simulation outputs from simulations folder and compare their results with the same output from our new R package

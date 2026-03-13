@@ -40,8 +40,8 @@ Requirements for initial release. Covers: installable package + code cleanup + c
 
 ### Documentation and Tests (v1 baseline)
 
-- [ ] **DOC-01**: All exported functions have roxygen2 documentation with `@param`, `@return`, and `@examples` (examples use bundled mini-dataset, not live network)
-- [ ] **DOC-02**: testthat test suite covering PKG, BUG, and DATA requirements using synthetic fixtures — CI passes without network access
+- [x] **DOC-01**: All exported functions have roxygen2 documentation with `@param`, `@return`, and `@examples` (examples use bundled mini-dataset, not live network)
+- [x] **DOC-02**: testthat test suite covering PKG, BUG, and DATA requirements using synthetic fixtures — CI passes without network access
 
 ## v2 Requirements
 
@@ -105,8 +105,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-04 | Phase 3 | Pending |
 | DATA-05 | Phase 3 | Pending |
 | DATA-06 | Phase 3 | Pending |
-| DOC-01 | Phase 4 | Pending |
-| DOC-02 | Phase 4 | Pending |
+| DOC-01 | Phase 4 | Complete |
+| DOC-02 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 21 total
