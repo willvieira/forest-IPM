@@ -79,9 +79,10 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. API Design | 1/1 | Complete | 2026-03-03 |
-| 2. Package Skeleton and Bug Fixes | 3/3 | Complete   | 2026-03-04 |
+| 2. Package Skeleton and Bug Fixes | 3/3 | Complete | 2026-03-04 |
 | 3. Remote Data Layer | 0/TBD | Not started | - |
 | 4. Documentation and Tests | 0/TBD | Not started | - |
+| 5. Compare Old vs New Package Results | 1/1 | Complete | 2026-03-13 |
 
 ### Phase 5: Create script to compare results between old version of the package and this new versions (specially eigen computation). We can use simulation outputs from simulations folder and compare their results with the same output from our new R package
 
@@ -91,7 +92,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 **Plans:** 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Write compare_versions.R: standalone script that loads new package, reproduces ipm_i.R parameter draw sequence, and diffs all 5 lambda metrics against final_output.RDS for ~15 stratified rows
+- [x] 05-01-PLAN.md — Write compare_versions.R: standalone script that loads new package, reproduces ipm_i.R parameter draw sequence, and diffs all 5 lambda metrics against final_output.RDS for ~15 stratified rows
 
 ### Phase 6: Run tests with profvis to check for potential efficiency gains
 

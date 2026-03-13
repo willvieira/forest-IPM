@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md — all tasks done, human sign-off recorded
-last_updated: "2026-03-12T14:03:50.230Z"
-last_activity: 2026-03-04 — Plan 02-02 executed and verified
+stopped_at: Completed 05-01-PLAN.md — compare_versions.R written and verified 15/15 PASS
+last_updated: "2026-03-13T00:00:00.000Z"
+last_activity: 2026-03-13 — Plan 05-01 executed and human-verified
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
-  percent: 62
+  completed_phases: 4
+  total_plans: 8
+  completed_plans: 8
+  percent: 75
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 
 ## Current Position
 
-Phase: 2 of 4 (Package Skeleton and Bug Fixes)
-Plan: 2 of 3 in current phase — COMPLETE
-Status: Phase 2 in progress — plan 02-02 complete, ready for 02-03
-Last activity: 2026-03-04 — Plan 02-02 executed and verified
+Phase: 5 of 6 (Compare Old vs New Package Results)
+Plan: 1 of 1 in current phase — COMPLETE
+Status: Phase 5 complete — compare_versions.R written, 15/15 rows PASS at 1e-10
+Last activity: 2026-03-13 — Plan 05-01 executed and human-verified
 
-Progress: [██████░░░░] 62%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -100,6 +100,10 @@ Recent decisions affecting current work:
 - [Phase 06]: Target 2 (truncnorm elimination) is the dominant gain source — F matrix 2.4x faster; Target 1 (outer vectorization) alone gives negligible speedup for P matrix
 - [Phase 06]: Remove truncnorm from DESCRIPTION Imports — dependency eliminated now that ingrowth_lk uses dnorm/pnorm; closes PITFALLS.md Pitfall 11
 - [Phase 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains]: Human approved Plan 03 optimizations: regression tests confirmed 1e-10 tolerance; 1.4x mkKernel() speedup and 2.4x F-matrix speedup accepted as complete
+- [Phase 05-01]: final_output.RDS is a compact list of 216021 elements (not 216027) — 6 missing IDs are absent rather than NULL-slotted; direct indexing by array_id fails above index 32793; use fo_idx lookup from array_id column
+- [Phase 05-01]: copy ref_output$par.BA_het for NULL-het rows to avoid NaN tolerance comparison (denominator is 0 when N_het_pertb = N_het = empty distribution)
+- [Phase 05-01]: pars_to_list() native pipe incompatibility with .[[]] placeholder — fixed by intermediate variable assignment after group_split()
+- [Phase 05-01]: All three key changes (RcppEigen solver, vectorized mkKernel, dnorm/pnorm ingrowth) confirmed numerically identical to cluster reference at 1e-10 — 15/15 stratified rows PASS
 
 ### Pending Todos
 
@@ -113,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T13:58:18.929Z
-Stopped at: Completed 06-03-PLAN.md — all tasks done, human sign-off recorded
+Last session: 2026-03-13T00:44:39Z
+Stopped at: Completed 05-01-PLAN.md — compare_versions.R written, verified 15/15 PASS, SUMMARY.md created
 Resume file: None
