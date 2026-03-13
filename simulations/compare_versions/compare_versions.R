@@ -45,8 +45,13 @@ pars_to_list <- function(pars) {
       vr  = case_match(vr, 'recruit' ~ 'rec', .default = vr)
     ) |>
     select(!name) |>
-    group_split(vr) |>
-    set_names(map_chr(., ~.x$vr[1])) |>
+    group_split(vr) ->
+  pars_l
+
+  set_names(
+    pars_l,
+    pars_l |> map_chr(~.x$vr[1])
+  ) |>
     map(~.x |> select(!vr) |> pivot_wider(names_from = par) |> unlist(use.names = TRUE))
 }
 
