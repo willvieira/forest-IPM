@@ -77,7 +77,7 @@ env_summary <- readRDS(file.path(data_path, "treeData.RDS")) |>
 # Build output
 # ---------------------------------------------------------------------------
 output <- sp_filtered |>
-  select(species_id) |>
+  select(species_id, species_name) |>
   left_join(common_names) |>
   left_join(env_summary) |>
   mutate(
