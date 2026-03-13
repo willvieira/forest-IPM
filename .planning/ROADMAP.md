@@ -69,7 +69,12 @@ Plans:
   1. `?get_params` and `?mkKernel` (and all other exported functions) open a help page with `@param`, `@return`, and `@examples` sections
   2. `devtools::run_examples()` completes without errors or warnings — all examples use the bundled mini-dataset, not live network calls
   3. `devtools::test()` passes with zero failures on a machine with no internet access
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Redesign plot.ipm_projection() (three-panel type dispatch) and establish test infrastructure (delete obsolete tests, write test-workflow.R)
+- [ ] 04-02-PLAN.md — Add @examples to all 11 exported functions and verify offline coverage
+- [ ] 04-03-PLAN.md — Rewrite guide_IPM.qmd, create deep_dive_IPM.qmd, restructure _quarto.yml with 3-section layout
 
 ## Progress
 
