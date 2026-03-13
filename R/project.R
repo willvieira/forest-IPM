@@ -364,9 +364,14 @@ plot.ipm_projection <- function(x, type = NULL, timestep = NULL, ...) {
     aes(n_trees, lambda) +
     aes(color = species_name) +
     geom_path() +
+    geom_hline(yintercept = 1, alpha = 0.2) +
     theme_classic() +
-    labs(x = 'Population size', y = expression(lambda)) +
-    geom_hline(yintercept = 1, alpha = 0.2)
+    labs(
+      x = 'Population size',
+      y = expression(lambda),
+      color = "Species"
+    ) +
+    theme(strip.background = element_blank())
   print(p)
   invisible(NULL)
 }
