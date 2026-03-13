@@ -164,10 +164,20 @@ summary.ipm_stand <- function(object, ...) {
 #' @export
 print.ipm_projection <- function(x, ...) {
   store_every <- if (length(x$years) > 1) x$years[2] - x$years[1] else 1
-  cat(sprintf("<ipm_projection>  %d species | %d years | store_every=%d\n",
+  cond <- x$conditions
+  draw_str <- if (!is.null(cond)) {
+    switch(cond$draw_type,
+      mean         = "mean",
+      random       = sprintf("random (id=%d, seed=%d)", cond$draw, cond$seed),
+      user_defined = sprintf("draw=%d", cond$draw),
+      "unknown"
+    )
+  } else "unknown"
+  cat(sprintf("<ipm_projection>  %d species | %d years | store_every=%d | draw=%s\n",
               length(x$species),
               if (length(x$years) > 0) max(x$years) else 0,
-              store_every))
+              store_every,
+              draw_str))
   invisible(x)
 }
 

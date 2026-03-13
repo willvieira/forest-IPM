@@ -166,7 +166,18 @@ project <- function(mod, pars, stand, env, ctrl) {
       years        = stored_t,
       lambda       = lambda_store,
       stand_series = stand_series,
-      summary      = tibble::as_tibble(summary_tbl)
+      summary      = tibble::as_tibble(summary_tbl),
+      conditions   = list(
+        draw_type   = pars$draw_type,
+        draw        = pars$draw,
+        seed        = pars$seed,
+        MAT         = if (is.function(env$MAT)) "function(t)" else env$MAT,
+        MAP         = if (is.function(env$MAP)) "function(t)" else env$MAP,
+        years       = ctrl$years,
+        delta_time  = ctrl$delta_time,
+        store_every = ctrl$store_every,
+        bin_width   = ctrl$bin_width
+      )
     ),
     class = "ipm_projection"
   )
@@ -191,6 +202,18 @@ summary.ipm_projection <- function(object, ...) {
     }
   } else {
     cat("  No timesteps stored.\n")
+  }
+  if (!is.null(object$conditions)) {
+    cond <- object$conditions
+    draw_str <- switch(cond$draw_type,
+      mean         = "mean",
+      random       = sprintf("random (id=%d, seed=%d)", cond$draw, cond$seed),
+      user_defined = sprintf("draw=%d", cond$draw)
+    )
+    mat_str <- if (is.character(cond$MAT)) cond$MAT else sprintf("%.1f\u00b0C", cond$MAT)
+    map_str <- if (is.character(cond$MAP)) cond$MAP else sprintf("%.0f mm/yr", cond$MAP)
+    cat(sprintf("  Parameters: %s\n", draw_str))
+    cat(sprintf("  Climate: MAT=%s  MAP=%s\n", mat_str, map_str))
   }
   invisible(object)
 }

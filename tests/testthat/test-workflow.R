@@ -162,6 +162,60 @@ test_that("plot(proj, type = 'invalid') raises error", {
 })
 
 # ---------------------------------------------------------------------------
+# Reproducibility: conditions tracking
+# ---------------------------------------------------------------------------
+test_that("lambda() carries conditions (draw_type, seed, MAT, MAP)", {
+  s    <- make_abibal_stand()
+  mod  <- species_model(s)
+  pars <- parameters(mod, draw = "random", seed = 123L)
+  env  <- env_condition(MAT = 8, MAP = 1200)
+  lam  <- lambda(mod, pars, s, env)
+  cond <- attr(lam, "conditions")
+  expect_false(is.null(cond))
+  expect_equal(cond$draw_type, "random")
+  expect_equal(cond$seed, 123L)
+  expect_equal(cond$MAT, 8)
+  expect_equal(cond$MAP, 1200)
+})
+
+test_that("lambda() with draw = 'mean' carries conditions with seed = NULL", {
+  s    <- make_abibal_stand()
+  mod  <- species_model(s)
+  pars <- parameters(mod, draw = "mean")
+  env  <- env_condition(MAT = 8, MAP = 1200)
+  lam  <- lambda(mod, pars, s, env)
+  cond <- attr(lam, "conditions")
+  expect_equal(cond$draw_type, "mean")
+  expect_null(cond$seed)
+})
+
+test_that("project() carries conditions with draw_type, seed, and climate", {
+  s    <- make_abibal_stand()
+  mod  <- species_model(s)
+  pars <- parameters(mod, draw = "random", seed = 99L)
+  env  <- env_condition(MAT = 6, MAP = 900)
+  ctrl <- control(years = 5, progress = FALSE)
+  proj <- project(mod, pars, s, env, ctrl)
+  cond <- proj$conditions
+  expect_false(is.null(cond))
+  expect_equal(cond$draw_type, "random")
+  expect_equal(cond$seed, 99L)
+  expect_equal(cond$MAT, 6)
+  expect_equal(cond$MAP, 900)
+  expect_equal(cond$years, 5L)
+})
+
+test_that("project() with time-varying MAT records 'function(t)' in conditions", {
+  s    <- make_abibal_stand()
+  mod  <- species_model(s)
+  pars <- parameters(mod, draw = "mean")
+  env  <- env_condition(MAT = function(t) 6 + t * 0.1, MAP = 1200)
+  ctrl <- control(years = 3, progress = FALSE)
+  proj <- project(mod, pars, s, env, ctrl)
+  expect_equal(proj$conditions$MAT, "function(t)")
+})
+
+# ---------------------------------------------------------------------------
 # supported_species()
 # ---------------------------------------------------------------------------
 test_that("supported_species() returns a data frame with species_id column", {

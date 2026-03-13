@@ -88,12 +88,30 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
     }
   )
 
-  structure(lambdas, class = "ipm_lambda")
+  structure(
+    lambdas,
+    class      = "ipm_lambda",
+    conditions = list(
+      draw_type = pars$draw_type,
+      draw      = pars$draw,
+      seed      = pars$seed,
+      MAT       = if (is.function(env$MAT)) "function(t)" else env$MAT,
+      MAP       = if (is.function(env$MAP)) "function(t)" else env$MAP
+    )
+  )
 }
 
 #' @export
 print.ipm_lambda <- function(x, ...) {
-  cat("<ipm_lambda>\n")
+  cond <- attr(x, "conditions")
+  draw_str <- if (!is.null(cond)) {
+    switch(cond$draw_type,
+      mean         = "mean",
+      random       = sprintf("random (id=%d, seed=%d)", cond$draw, cond$seed),
+      user_defined = sprintf("draw=%d", cond$draw)
+    )
+  } else "unknown"
+  cat(sprintf("<ipm_lambda>  draw=%s\n", draw_str))
   for (sp in names(x)) {
     cat(sprintf("  %s: %.4f\n", sp, x[[sp]]))
   }
@@ -103,6 +121,18 @@ print.ipm_lambda <- function(x, ...) {
 #' @export
 summary.ipm_lambda <- function(object, ...) {
   cat("<ipm_lambda> summary\n")
+  cond <- attr(object, "conditions")
+  if (!is.null(cond)) {
+    draw_str <- switch(cond$draw_type,
+      mean         = "mean",
+      random       = sprintf("random (id=%d, seed=%d)", cond$draw, cond$seed),
+      user_defined = sprintf("draw=%d", cond$draw)
+    )
+    mat_str <- if (is.character(cond$MAT)) cond$MAT else sprintf("%.1f\u00b0C", cond$MAT)
+    map_str <- if (is.character(cond$MAP)) cond$MAP else sprintf("%.0f mm/yr", cond$MAP)
+    cat(sprintf("  Parameters: %s\n", draw_str))
+    cat(sprintf("  Climate: MAT=%s  MAP=%s\n", mat_str, map_str))
+  }
   cat(sprintf("  Species: %d\n", length(object)))
   for (sp in names(object)) {
     status <- if (object[[sp]] > 1) "growing (lambda > 1)"
