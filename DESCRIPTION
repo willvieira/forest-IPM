@@ -1,7 +1,7 @@
 Package: forestIPM
 Type: Package
 Title: Bayesian Hierarchical Integral Projection Model for Tree Population Dynamics
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: person("Willian", "Vieira", email = "willian.vieira@usherbrooke.ca", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0283-4570"))
 Description: Integral Projection Model for studying tree population dynamics in eastern North America. Uses Bayesian hierarchical vital rate models parameterized from forest inventory data.
 License: MIT + file LICENSE
