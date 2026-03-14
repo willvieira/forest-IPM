@@ -1,0 +1,36 @@
+url: https://willvieira.github.io/forest-IPM/
+
+template:
+  bootstrap: 5
+  bootswatch: materia
+
+navbar:
+  structure:
+    left:  [intro, reference]
+    right: [book, github]
+  components:
+    book:
+      text: "Book"
+      href: https://willvieira.github.io/book_forest-demography-IPM/
+
+reference:
+  - title: "IPM Constructors"
+    desc: "Functions to build IPM components"
+    contents:
+      - stand
+      - species_model
+      - env_condition
+      - parameters
+      - control
+  - title: "IPM Engines"
+    desc: "Functions to run IPM calculations"
+    contents:
+      - lambda
+      - project
+  - title: "Utilities"
+    desc: "Helper functions"
+    contents:
+      - supported_species
+      - scale_env
+      - unscale_env
+      - set_random_effects
