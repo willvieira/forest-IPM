@@ -90,6 +90,7 @@ ingrowth_lk <- function(
 #' @return A named list with elements \code{K} (full kernel), \code{P} (growth
 #'   x survival kernel), and \code{F} (recruitment kernel), each a square matrix
 #'   of dimension equal to the number of mesh points.
+#' @keywords internal
 mkKernel = function(
   Nvec_intra, Nvec_inter,
   delta_time, plotSize, Temp, Prec, pars,

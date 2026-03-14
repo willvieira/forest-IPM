@@ -24,6 +24,7 @@ size_to_BAind <- function(
 #' @param plot_size Numeric. Plot area in square meters.
 #'
 #' @return Numeric scalar. Total basal area in m2/ha.
+#' @keywords internal
 size_to_BAplot <- function(
 	N,
 	plot_size
@@ -73,6 +74,7 @@ size_to_BAcomp <- function(
 #'
 #' @return A copy of \code{N_intra} with \code{$Nvec} replaced by the count of
 #'   individuals in each mesh size class.
+#' @keywords internal
 dbh_to_sizeDist <- function(
 	dbh,
 	N_intra

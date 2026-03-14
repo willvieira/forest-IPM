@@ -38,9 +38,3 @@ reference:
     desc: "Plotting and diagnostic functions"
     contents:
       - plot.ipm_projection
-      - size_to_BAplot
-  - title: "Internal helpers"
-    desc: "Low-level size distribution and kernel utilities"
-    contents:
-      - dbh_to_sizeDist
-      - mkKernel
