@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/willvieira/forestIPM/blob/master/DESCRIPTION)
 
 Vieira W (2026). *forestIPM: Bayesian Hierarchical Integral Projection
-Model for Tree Population Dynamics*. R package version 0.1.0,
+Model for Tree Population Dynamics*. R package version 1.0.0,
 <https://github.com/willvieira/forestIPM>.
 
     @Manual{,
       title = {forestIPM: Bayesian Hierarchical Integral Projection Model for Tree Population Dynamics},
       author = {Willian Vieira},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 1.0.0},
       url = {https://github.com/willvieira/forestIPM},
     }
