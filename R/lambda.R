@@ -3,14 +3,14 @@
 #' @param mod An \code{ipm_spModel} object.
 #' @param pars An \code{ipm_parameters} object. Must contain parameters for at
 #'   least one species in \code{mod}. Lambda is computed only for species present
-#'   in both \code{mod} and \code{pars} \u2014 other species in \code{stand} are used
+#'   in both \code{mod} and \code{pars} - other species in \code{stand} are used
 #'   as competitors but do not appear in the output.
 #' @param stand An \code{ipm_stand} object. Provides size distributions for all
 #'   species (focal and competitors).
 #' @param env An \code{ipm_env} object. Climate drivers.
 #' @param ctrl An \code{ipm_control} object or NULL. Only \code{bin_width} and
 #'   \code{delta_time} are used. If NULL, defaults are used.
-#' @return An object of S3 class \code{"ipm_lambda"} \u2014 a named numeric vector
+#' @return An object of S3 class \code{"ipm_lambda"} - a named numeric vector
 #'   with one element per focal species (species with available parameters).
 #' @examples
 #' df <- data.frame(size_mm = c(150, 200, 350),
@@ -62,7 +62,7 @@ lambda <- function(mod, pars, stand, env, ctrl = NULL) {
       if (is.null(sp_pars)) {
         cli::cli_abort(
           "Parameters for focal species {.val {sp}} are NULL. \\
-          Cannot compute lambda \u2014 ensure the RDS file for this species is present."
+          Cannot compute lambda - ensure the RDS file for this species is present."
         )
       }
 
