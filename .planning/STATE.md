@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-03-14T00:11:10Z"
-last_activity: 2026-03-14 — Plan 07-03 executed (README and DESCRIPTION updated)
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-14T00:25:00Z"
+last_activity: 2026-03-14 — Plan 07-02 executed (pkgdown site config and GitHub Actions workflow created)
 progress:
   total_phases: 7
   completed_phases: 5
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 7 of 7 (Add GitHub Actions CI with code coverage and pkgdown site with README pointing to book vignettes)
-Plan: 3 of 3 in current phase — COMPLETE
-Status: Phase 7 plan 03 complete — README rewritten with badges and book link; DESCRIPTION updated with URL and Suggests
-Last activity: 2026-03-14 — Plan 07-03 executed (README and DESCRIPTION updated)
+Plan: 2 of 3 in current phase — COMPLETE (07-02 executed; 07-01 and 07-03 also complete)
+Status: Phase 7 plan 02 complete — _pkgdown.yml and pkgdown.yaml GitHub Actions workflow created
+Last activity: 2026-03-14 — Plan 07-02 executed (pkgdown site config and GitHub Actions workflow created)
 
 Progress: [████████░░] 75%
 
@@ -58,6 +58,8 @@ Progress: [████████░░] 75%
 | Phase 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains P03 | 525548 | 3 tasks | 6 files |
 | Phase 04 P01 | 15 | 2 tasks | 5 files |
 | Phase 07 P03 | 4 | 2 tasks | 2 files |
+| Phase 07 P02 | 15 | 2 tasks | 2 files |
+| Phase 07 P01 | 10 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -113,6 +115,12 @@ Recent decisions affecting current work:
 - [Phase 07-03]: README uses R-CMD-check.yaml badge URL to reference exact workflow filename from Plan 01
 - [Phase 07-03]: codecov badge uses graph/badge.svg format (public repo, no token needed for badge display)
 - [Phase 07-03]: Suggests field declares covr, pkgdown, and testthat to prevent R CMD check NOTEs
+- [Phase 07-02]: pkgdown site URL is first key in _pkgdown.yml for canonical link tag
+- [Phase 07-02]: JamesIves/github-pages-deploy-action@v4.5.0 used instead of GitHub native deploy-pages action
+- [Phase 07-02]: GitHub Pages must be manually enabled in Settings > Pages > Source = gh-pages branch after first workflow run
+- [Phase 07-01]: Linux-only (ubuntu-latest) with R release — no matrix, no Windows, no macOS rows to keep CI simple and fast
+- [Phase 07-01]: Two separate workflow files — coverage failures do not block check result and vice versa
+- [Phase 07-01]: setup-r-dependencies handles Rcpp/RcppEigen system deps via pak; manual apt-get only needed if g++ not found on first CI run
 
 ### Pending Todos
 
@@ -126,6 +134,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-14T00:11:10Z
-Stopped at: Completed 07-03-PLAN.md
-Resume file: .planning/phases/07-add-github-actions-ci-with-code-coverage-and-pkgdown-site-with-readme-pointing-to-book-vignettes/07-03-SUMMARY.md
+Last session: 2026-03-14T00:35:00Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-add-github-actions-ci-with-code-coverage-and-pkgdown-site-with-readme-pointing-to-book-vignettes/07-01-SUMMARY.md

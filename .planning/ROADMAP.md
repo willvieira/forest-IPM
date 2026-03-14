@@ -88,6 +88,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 3. Remote Data Layer | 0/TBD | Not started | - |
 | 4. Documentation and Tests | 1/3 | In Progress|  |
 | 5. Compare Old vs New Package Results | 1/1 | Complete | 2026-03-13 |
+| 6. Run tests with profvis | 3/3 | Complete | 2026-03-13 |
+| 7. GitHub Actions CI + pkgdown + README | 3/3 | Complete | 2026-03-14 |
 
 ### Phase 5: Create script to compare results between old version of the package and this new versions (specially eigen computation). We can use simulation outputs from simulations folder and compare their results with the same output from our new R package
 
@@ -120,5 +122,5 @@ Plans:
 
 Plans:
 - [ ] 07-01-PLAN.md — Create R-CMD-check.yaml and test-coverage.yaml GitHub Actions workflows (Linux/R release, codecov upload)
-- [ ] 07-02-PLAN.md — Create _pkgdown.yml (bs5 materia theme, book navbar) and pkgdown.yaml deploy workflow (gh-pages branch)
+- [x] 07-02-PLAN.md — Create _pkgdown.yml (bs5 materia theme, book navbar) and pkgdown.yaml deploy workflow (gh-pages branch)
 - [x] 07-03-PLAN.md — Rewrite README.md (badges, book link, minimal intro) and update DESCRIPTION (URL, Suggests fields)
