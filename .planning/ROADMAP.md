@@ -121,6 +121,6 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Create R-CMD-check.yaml and test-coverage.yaml GitHub Actions workflows (Linux/R release, codecov upload)
+- [x] 07-01-PLAN.md — Create R-CMD-check.yaml and test-coverage.yaml GitHub Actions workflows (Linux/R release, codecov upload)
 - [x] 07-02-PLAN.md — Create _pkgdown.yml (bs5 materia theme, book navbar) and pkgdown.yaml deploy workflow (gh-pages branch)
 - [x] 07-03-PLAN.md — Rewrite README.md (badges, book link, minimal intro) and update DESCRIPTION (URL, Suggests fields)
