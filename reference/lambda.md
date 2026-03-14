@@ -18,7 +18,7 @@ lambda(mod, pars, stand, env, ctrl = NULL)
 
   An `ipm_parameters` object. Must contain parameters for at least one
   species in `mod`. Lambda is computed only for species present in both
-  `mod` and `pars` 2014 other species in `stand` are used as competitors
+  `mod` and `pars` - other species in `stand` are used as competitors
   but do not appear in the output.
 
 - stand:
@@ -37,8 +37,8 @@ lambda(mod, pars, stand, env, ctrl = NULL)
 
 ## Value
 
-An object of S3 class `"ipm_lambda"` 2014 a named numeric vector with
-one element per focal species (species with available parameters).
+An object of S3 class `"ipm_lambda"` - a named numeric vector with one
+element per focal species (species with available parameters).
 
 ## Examples
 
