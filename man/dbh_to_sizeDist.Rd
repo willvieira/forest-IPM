@@ -19,3 +19,4 @@ individuals in each mesh size class.
 Bins individual tree diameter observations into the mesh point grid defined
 by an \code{init_pop()} output object.
 }
+\keyword{internal}

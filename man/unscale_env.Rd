@@ -2,14 +2,14 @@
 % Please edit documentation in R/env_scaling.R
 \name{unscale_env}
 \alias{unscale_env}
-\title{Unscale environmental values from \link{0, 1} to natural units}
+\title{Unscale environmental values from [0, 1] to natural units}
 \usage{
 unscale_env(MAT, MAP)
 }
 \arguments{
-\item{MAT}{Numeric. Scaled mean annual temperature in \link{0, 1}.}
+\item{MAT}{Numeric. Scaled mean annual temperature in [0, 1].}
 
-\item{MAP}{Numeric. Scaled mean annual precipitation in \link{0, 1}.}
+\item{MAP}{Numeric. Scaled mean annual precipitation in [0, 1].}
 }
 \value{
 A named list with elements \code{MAT} (degrees Celsius) and

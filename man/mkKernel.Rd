@@ -43,3 +43,4 @@ of dimension equal to the number of mesh points.
 Assembles the full Integral Projection Model kernel (K = P + F) for a
 focal species given its size distribution vectors and environmental conditions.
 }
+\keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/env_scaling.R
 \name{scale_env}
 \alias{scale_env}
-\title{Scale environmental values to \link{0, 1}}
+\title{Scale environmental values to [0, 1]}
 \usage{
 scale_env(MAT, MAP)
 }
@@ -13,10 +13,10 @@ scale_env(MAT, MAP)
 }
 \value{
 A named list with elements \code{MAT} and \code{MAP}, each scaled
-to \link{0, 1}.
+to [0, 1].
 }
 \description{
-Scales mean annual temperature and precipitation to the \link{0, 1} range using
+Scales mean annual temperature and precipitation to the [0, 1] range using
 the observed ranges stored in the package. These scaled values are what the
 IPM vital rate functions expect internally.
 }

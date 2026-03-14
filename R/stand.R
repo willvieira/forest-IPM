@@ -205,7 +205,7 @@ print.ipm_projection <- function(x, ...) {
         out
       }))
     }
-    modifyList(nvec_list[[sp]], list(N_het = N_het))
+    utils::modifyList(nvec_list[[sp]], list(N_het = N_het))
   })
-  modifyList(nvec_list, updated)
+  utils::modifyList(nvec_list, updated)
 }

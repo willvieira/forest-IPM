@@ -26,7 +26,7 @@ vonBertalanffy_lk = function(
   growth_mean = vonBertalanffy_f(pars, delta_time, size_t0, BA_comp_intra, BA_comp_inter, Temp, Prec, plot_random)
 
   # likelihood of increment y given defined model and parameters
-  growth = dnorm(size_t1, mean = growth_mean, sd = pars['sigma_obs'])
+  growth = stats::dnorm(size_t1, mean = growth_mean, sd = pars['sigma_obs'])
 
   return( growth )
 }
@@ -61,7 +61,7 @@ ingrowth_lk <- function(
   # Target 2: replace truncnorm::dtruncnorm with base R dnorm/pnorm
   # Equivalent: dnorm(x, mu, sig) / (1 - pnorm(a, mu, sig)), a=127, b=Inf
   # Base R dnorm/pnorm vectorize natively; no per-call R-to-C boundary overhead.
-  (dnorm(size_t1, mean = mu, sd = sig) / (1 - pnorm(127, mean = mu, sd = sig)))
+  (stats::dnorm(size_t1, mean = mu, sd = sig) / (1 - stats::pnorm(127, mean = mu, sd = sig)))
 
   return( ingrowth_prob )
 }

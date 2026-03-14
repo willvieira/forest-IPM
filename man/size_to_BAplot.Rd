@@ -18,3 +18,4 @@ Numeric scalar. Total basal area in m2/ha.
 Converts an individual size distribution vector into plot-level basal area
 (m2/ha).
 }
+\keyword{internal}
