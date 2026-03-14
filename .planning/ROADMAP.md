@@ -110,3 +110,15 @@ Plans:
 - [ ] 06-01-PLAN.md — Capture pre-optimization baselines and apply tidyverse-style revamp to all R/ source files
 - [ ] 06-02-PLAN.md — Write and run profvis benchmarking script, produce PROFILING.md with hotspot analysis and flamegraph
 - [ ] 06-03-PLAN.md — Apply approved optimizations to kernel.R/project.R, run before/after benchmark, update PROFILING.md
+
+### Phase 7: Add GitHub Actions CI with code coverage and pkgdown site with README pointing to book vignettes
+
+**Goal:** Set up CI/CD infrastructure: GitHub Actions CI on Linux with R release, code coverage via codecov.io, pkgdown site deployed to GitHub Pages, and README rewrite with badges pointing to book documentation
+**Requirements**: TST-01, TST-02, DOC-04
+**Depends on:** Phase 6
+**Plans:** 3 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Create R-CMD-check.yaml and test-coverage.yaml GitHub Actions workflows (Linux/R release, codecov upload)
+- [ ] 07-02-PLAN.md — Create _pkgdown.yml (bs5 materia theme, book navbar) and pkgdown.yaml deploy workflow (gh-pages branch)
+- [ ] 07-03-PLAN.md — Rewrite README.md (badges, book link, minimal intro) and update DESCRIPTION (URL, Suggests fields)
