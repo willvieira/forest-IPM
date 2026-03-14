@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 7 context gathered
-last_updated: "2026-03-13T23:50:37.003Z"
-last_activity: 2026-03-13 — Plan 05-01 executed and human-verified
+stopped_at: Completed 07-03-PLAN.md
+last_updated: "2026-03-14T00:11:10Z"
+last_activity: 2026-03-14 — Plan 07-03 executed (README and DESCRIPTION updated)
 progress:
   total_phases: 7
   completed_phases: 5
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 
 ## Current Position
 
-Phase: 5 of 6 (Compare Old vs New Package Results)
-Plan: 1 of 1 in current phase — COMPLETE
-Status: Phase 5 complete — compare_versions.R written, 15/15 rows PASS at 1e-10
-Last activity: 2026-03-13 — Plan 05-01 executed and human-verified
+Phase: 7 of 7 (Add GitHub Actions CI with code coverage and pkgdown site with README pointing to book vignettes)
+Plan: 3 of 3 in current phase — COMPLETE
+Status: Phase 7 plan 03 complete — README rewritten with badges and book link; DESCRIPTION updated with URL and Suggests
+Last activity: 2026-03-14 — Plan 07-03 executed (README and DESCRIPTION updated)
 
 Progress: [████████░░] 75%
 
@@ -57,6 +57,7 @@ Progress: [████████░░] 75%
 | Phase 06 P03 | 120 | 2 tasks | 6 files |
 | Phase 06-run-tests-with-profvis-to-check-for-potential-efficiency-gains P03 | 525548 | 3 tasks | 6 files |
 | Phase 04 P01 | 15 | 2 tasks | 5 files |
+| Phase 07 P03 | 4 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 04-01]: plot.ipm_projection type=NULL renders all three panels using existing ipm_projection fields (lambda list, stand_series, summary tibble)
 - [Phase 04-01]: Three obsolete test files deleted: pkgload::pkg_path() at top-level scope causes R CMD check failures; coverage superseded by workflow tests
 - [Phase 04-01]: test-workflow.R adapts assertions to real API: s$trees not s$data, lam[[sp]] not lam$lambda[[sp]], proj$stand_series not proj$pop
+- [Phase 07-03]: README uses R-CMD-check.yaml badge URL to reference exact workflow filename from Plan 01
+- [Phase 07-03]: codecov badge uses graph/badge.svg format (public repo, no token needed for badge display)
+- [Phase 07-03]: Suggests field declares covr, pkgdown, and testthat to prevent R CMD check NOTEs
 
 ### Pending Todos
 
@@ -122,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T23:50:36.990Z
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-add-github-actions-ci-with-code-coverage-and-pkgdown-site-with-readme-pointing-to-book-vignettes/07-CONTEXT.md
+Last session: 2026-03-14T00:11:10Z
+Stopped at: Completed 07-03-PLAN.md
+Resume file: .planning/phases/07-add-github-actions-ci-with-code-coverage-and-pkgdown-site-with-readme-pointing-to-book-vignettes/07-03-SUMMARY.md
