@@ -1,9 +1,5 @@
 url: https://willvieira.github.io/forestIPM/
 
-template:
-  bootstrap: 5
-  bootswatch: materia
-
 navbar:
   structure:
     left:  [intro, reference]
@@ -38,3 +34,8 @@ reference:
     desc: "Plotting and diagnostic functions"
     contents:
       - plot.ipm_projection
+
+template:
+  bootstrap: 5
+  params:
+    highlightcss: false
